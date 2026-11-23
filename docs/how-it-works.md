@@ -34,7 +34,7 @@ do not belong to is refused. See [Platform](./tools/platform.md). An administrat
 
 The tools identify a project by the id that `a365_design_project_list` returns, and the assistant is instructed to find
 projects in each conversation rather than reuse ids from memory. A revision is a full 40-character commit hash; the
-assistant gets those from the project history or from the project's revision list.
+assistant gets those from the project history, or from the revisions column of `a365_design_project_details`.
 
 A variant is named by its name in the project. The base design is `[No Variations]`, and it is what the tools read
 when no variant is named. With a variant, the schematic data reflects it: Not Fitted components are excluded and
