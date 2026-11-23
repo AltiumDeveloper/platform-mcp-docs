@@ -13,12 +13,14 @@ on:
       - "docs/**"
       - "devcenter/**"
       - "website/**"
+      - "CHANGELOG.md"
       - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs/**"
       - "devcenter/**"
       - "website/**"
+      - "CHANGELOG.md"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
