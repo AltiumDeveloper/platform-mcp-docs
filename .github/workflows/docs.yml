@@ -1,0 +1,70 @@
+name: Docs
+
+# Builds the Docusaurus site in website/ from source (docs/, read in place) and deploys it to GitHub Pages. Nothing
+# generated is checked in. PRs run the whole build, which fails on broken links or anchors, a search index that points
+# at a missing page or anchor, a broken llms.txt surface, or a Developer Center page (devcenter/) whose links into the
+# site do not resolve; only main deploys.
+#
+# One-time repo setting: Settings → Pages → Build and deployment → Source = GitHub Actions.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "devcenter/**"
+      - "website/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "devcenter/**"
+      - "website/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: website
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      # Node 22 bundles npm 10; install with the npm contributors use, so a change in npm's install rules (npm 12
+      # refuses URL dependencies unless website/.npmrc allows them) fails here rather than on their machines.
+      - run: npm install -g npm@12
+      - run: npm ci
+      - run: npm test
+      # search:index → docusaurus build → search:check → llms → llms:check → devcenter:check
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: website/build
+
+  deploy:
+    # Deploy only from main; PRs stop after a successful build.
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

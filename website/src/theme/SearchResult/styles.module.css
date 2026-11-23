@@ -1,0 +1,34 @@
+/* This site's parts of a search result and the search filter; the rest is the theme's SearchBar styles. Sizes follow
+ * the Altium 365 API reference's search results. */
+
+.tool {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.group {
+  flex: none;
+  font-size: 0.68rem;
+}
+
+.select {
+  max-width: 15rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--alt-border-strong);
+  border-radius: 6px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+}
+
+@media (max-width: 640px) {
+  .group {
+    display: none;
+  }
+}
