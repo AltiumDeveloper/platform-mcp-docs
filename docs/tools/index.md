@@ -40,7 +40,8 @@ Your client's tool list always shows the tools the server offers today.
 - **A workspace.** Every tool accepts an optional workspace URL. Without one, it works on your default workspace. A
   connection restricted to one workspace has no workspace URL argument.
 - **Batches.** Tools that take ids take several at once: many projects, revisions, variants, threads or comments in one
-  call. Each tool caps the size of a batch; a call over the cap is rejected with an error that names the limit.
+  call. Each tool caps the size of a batch. A call over the cap is usually rejected with an error that names the limit;
+  a few tools instead answer part of the batch and list what they left out.
 - **Field selection.** Most tools return a default set of columns and accept a list of the fields to return instead.
 - **Paging.** Long lists come back a page at a time, 50 rows by default, with a cursor for the next page.
 - **Partial results.** When some entries of a batch fail, the others are still returned, and the response lists the
