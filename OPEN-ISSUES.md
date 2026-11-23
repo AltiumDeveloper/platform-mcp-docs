@@ -7,8 +7,8 @@ here.
 
 1. **Live walkthrough and screenshots.** The Claude and Claude Code steps in `docs/setup.md` match those clients'
    official documentation. Still to do with a production account against `https://mcp.altium.com`:
-   - VS Code: its documentation does not say whether it signs in with a client ID metadata document, which Altium's
-     sign-in service requires. Confirm it connects, or drop it from the pages.
+   - VS Code: the steps follow its current documentation, and 1.106 release notes confirm client ID metadata document
+     sign-in. Confirm the **Add Server** flow and the sign-in in the product.
    - Whether a first sign-in needs anything from a workspace administrator.
    - Screenshots of the Claude connector dialog and the Altium sign-in page, in `devcenter/images/` (used by both
      sites, as in ad-mcp-docs).

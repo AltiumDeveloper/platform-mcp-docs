@@ -1,8 +1,8 @@
 # Schematic
 
 The Schematic tools read the schematic of a committed revision: its compiled design, images of its sheets, and how it
-differs from another revision or between variants. All of them take a project, optional revisions (the latest when
-omitted) and an optional variant.
+differs from another revision or between variants. All of them take a project and an optional variant. The revision is
+optional and defaults to the latest, except for `a365_schematic_diff_details`, which needs the revision to compare.
 
 ## Schematic data
 
@@ -12,8 +12,8 @@ omitted) and an optional variant.
 
 | Tool | Kind | What it does |
 | --- | --- | --- |
-| `a365_schematic_summary_details` | Read-only | The overview of one or more revisions: sheets with their document ids, component and net counts, a histogram of component types, power rail names and the custom property names in use. The assistant's orientation step; the query tool is instructed not to run before it. |
-| `a365_schematic_script_run` | Read-only | The workhorse. Runs a short JavaScript query against the design model (components, pins, nets, net classes, differential pairs, sheets, parameters, footprints and MPNs) and returns exactly the answer asked for, instead of the whole netlist. Runs against one or more revisions and variants in one call. |
+| `a365_schematic_summary_details` | Read-only | The overview of up to 10 revisions: sheets with their document ids, component and net counts, a histogram of component types, power rail names and the custom property names in use. The assistant's orientation step; the query tool is instructed not to run before it. |
+| `a365_schematic_script_run` | Read-only | The workhorse. Runs a short JavaScript query against the design model (components, pins, nets, net classes, differential pairs, sheets, parameters, footprints and MPNs) and returns exactly the answer asked for, instead of the whole netlist. Runs against up to 10 revisions and variants in one call. |
 
 Both also take optional sheets to restrict the answer to.
 
@@ -44,8 +44,8 @@ connectivity model cannot express, such as notes, annotations and layout. For co
 
 | Tool | Kind | What it does |
 | --- | --- | --- |
-| `a365_schematic_screenshot_capture` | Read-only | Images of whole sheets: every sheet of a revision, or only the ones named. Several projects and revisions in one call. |
-| `a365_schematic_object_highlight` | Read-only | Finds components by designator or nets by name and returns an image of each occurrence framed in its sheet, plus a report of every sheet each one was found on. A component placed on several sheets yields one image per sheet. |
+| `a365_schematic_screenshot_capture` | Read-only | Images of whole sheets: every sheet of a revision, or only the ones named, up to 20 images per call. Up to 10 projects and revisions in one call; when sheets are left out, the response lists them. |
+| `a365_schematic_object_highlight` | Read-only | Finds up to 25 components by designator or nets by name and returns an image of each occurrence framed in its sheet, plus a report of every sheet each one was found on. A component placed on several sheets yields one image per sheet. |
 
 A few details that are not obvious from the names:
 

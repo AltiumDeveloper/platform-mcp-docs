@@ -60,8 +60,9 @@ characters.
   includes with it. That is the design data the assistant asked for, such as the components on a net or a rendered
   sheet. Your provider's terms apply, as they do when you paste a snippet into a chat by hand. The MCP server sees the
   tool calls your client makes, not the conversation around them.
-- **Operational telemetry** goes to Altium: which tool ran, whether it succeeded, how long it took, and which client and
-  workspace made the call. It does not include your email address, your name, access tokens or workspace URLs.
+- **Operational telemetry** goes to Altium: which tool ran, whether it succeeded, how long it took, the size of the
+  response, which client, workspace and organisation made the call, and opaque user, session and conversation
+  identifiers. It does not include your email address, your name, access tokens or workspace URLs.
 
 ## What is left to your judgement
 

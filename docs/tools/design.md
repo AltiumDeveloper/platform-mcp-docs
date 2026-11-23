@@ -10,7 +10,7 @@ The assistant is instructed to look projects up in each conversation rather than
 | Tool | Kind | What it does |
 | --- | --- | --- |
 | `a365_design_project_list` | Read-only | The projects in the workspace, filterable by name and by creation or modification date. 50 per page by default. |
-| `a365_design_project_details` | Read-only | Details of one or more projects in one call: name, description, URL, dates and authors, plus on request the variants with their schematic and PCB document ids, the latest release, the project parameters, and the revision history, newest first. |
+| `a365_design_project_details` | Read-only | Details of one or more projects in one call: name, description, URL, dates and authors, the variants with their schematic and PCB document ids, and the latest release, plus on request the project parameters and the revision history, newest first. Up to 50 projects per call. |
 | `a365_design_projectvariant_list` | Read-only | The variants of one or more projects, one row per variant, including the base design `[No Variations]`. The schematic tools reject a variant name the project does not declare, so the assistant reads this first. |
 
 A few details that are not obvious from the names:
@@ -41,8 +41,8 @@ A few details that are not obvious from the names:
   MPNs, footprints, pins or wiring, or for two revisions that are not neighbours, use
   `a365_schematic_diff_details`, described under
   [Comparing revisions and variants](./schematic.md#comparing-revisions-and-variants).
-- **The record takes a moment.** Right after a commit, its record is still being processed and its change lists are
-  empty. Commits made before the workspace started recording changes have no record.
+- **The record is not ready at once.** Right after a commit, its record is still being processed and its change lists
+  are empty. Commits made before the workspace started recording changes have no record.
 - **Only the newest 500 events can be paged through.** Filter by event type, file or text to reach older ones.
 - **Anonymised authors are flagged.** If the workspace masks an author, the name shown is not a real user name.
 

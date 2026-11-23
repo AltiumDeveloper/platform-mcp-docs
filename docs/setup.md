@@ -27,9 +27,11 @@ These steps work for Claude on the web (<https://claude.ai>) and in Claude Deskt
 
 1. Open **Customize → Connectors**, click **+ Add**, then **Add custom connector**.
 2. Enter a name, for example *Altium 365*, and the URL `https://mcp.altium.com`, then click **Continue**.
-3. Review the detected authentication settings. Under **OAuth client**, keep **Use Claude's published identity**, the
-   recommended option, then click **Add**. **Register automatically** does not work with Altium's sign-in service.
-4. Click **Connect**, sign in with your Altium account in the browser window that opens, and allow access.
+3. Review the detected authentication settings and click **Continue**.
+4. Under **Authentication**, choose a sign-in option rather than **No sign in**. Under **OAuth client**, keep
+   **Use Claude's published identity (Recommended)**; **Register automatically** does not work with Altium's sign-in
+   service. Click **Add**.
+5. Sign in with your Altium account in the browser window that opens, and allow access.
 
 On a Claude Team or Enterprise plan, members cannot add custom connectors. An owner adds it once for the organization:
 **Organization settings → Connectors**, **Add**, then **Custom → Web**, with the same name, URL and OAuth client. Each
@@ -49,12 +51,19 @@ client ID is needed.
 
 ## Connect VS Code
 
-Add the server to your MCP configuration, either `.vscode/mcp.json` in a workspace or your user configuration
-(**MCP: Open User Configuration** in the Command Palette):
+VS Code 1.106 or later signs in with Altium's sign-in method by itself. In a Copilot chat session:
+
+1. Run **Chat: Open Customizations** and select **MCP Servers**.
+2. Select **Add Server**, enter `https://mcp.altium.com`, and choose where to save it: **Global → Copilot Global** for
+   yourself.
+3. Sign in with your Altium account when VS Code asks, then ask a question that needs the server.
+
+To configure it by file instead, add the server to `.mcp.json` at the root of a workspace, or to
+`~/.copilot/mcp-config.json` for yourself:
 
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "altium-365": {
       "type": "http",
       "url": "https://mcp.altium.com"
@@ -62,10 +71,6 @@ Add the server to your MCP configuration, either `.vscode/mcp.json` in a workspa
   }
 }
 ```
-
-Start the server from the configuration file, or manage it under **Chat: Open Customizations → MCP Servers**. VS Code
-asks you to sign in with your Altium account the first time. The tools are then available in Copilot Chat in agent
-mode.
 
 ## Other clients
 

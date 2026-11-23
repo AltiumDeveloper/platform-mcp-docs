@@ -9,8 +9,8 @@ reading that went wrong, not the data. [Working with the LLM](./working-with-the
 
 ## What the server reads
 
-The server reads what is stored in your Altium 365 workspace, through the same services the Altium 365 web interface
-uses, and acting as you. It never sees your PC.
+The server reads what is stored in your Altium 365 workspace, through Altium 365's own platform services, acting as
+you. It never sees your PC.
 
 - **Committed revisions, not your working copy.** Each schematic question is answered from a committed revision of the
   project: the latest one unless you name another. Edits you have not committed from Altium Designer are not visible.
@@ -18,9 +18,9 @@ uses, and acting as you. It never sees your PC.
   differential pairs, sheets and parameters, resolved across sheets. Wires, ports, net labels and coordinates are not
   part of that model. When a question is about how a sheet looks, the
   [image tools](./tools/schematic.md#schematic-images) render it.
-- **Design data is generated after a commit.** Altium 365 builds the design data a few moments after each commit. A
-  question about a revision that is still being processed is answered with *Design data generation is in progress*;
-  ask again shortly. A revision whose design data generation failed or was skipped is reported as such; use another
+- **Design data is generated after a commit.** Altium 365 builds the design data for each commit, which takes some
+  time. A question about a revision that is still being processed is answered with *Design data generation is in
+  progress*; ask again later. A revision whose design data generation failed or was skipped is reported as such; use another
   revision.
 
 ## Workspaces

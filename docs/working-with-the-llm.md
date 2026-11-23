@@ -6,7 +6,7 @@ make the answers better.
 ## Name the project
 
 The assistant can only work on a project it has found in this conversation. Name the project, and the workspace if it is
-not your default one. If several projects have similar names, the assistant lists them and asks which you mean.
+not your default one. If several projects have similar names, name the one you mean, or ask the assistant to list the matches first.
 
 ## Say which revision and variant
 

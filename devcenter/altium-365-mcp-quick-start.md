@@ -17,15 +17,17 @@ There is nothing to install, and Altium Designer does not need to be running.
 
 1. In Claude, open **Customize → Connectors**, click **+ Add**, then **Add custom connector**.
 2. Enter the name *Altium 365* and the URL `https://mcp.altium.com`, then click **Continue**.
-3. Under **OAuth client**, keep **Use Claude's published identity**, then click **Add**.
+3. Review the detected authentication settings and click **Continue**.
+4. Under **OAuth client**, keep **Use Claude's published identity (Recommended)**, then click **Add**.
 
 On a Claude Team or Enterprise plan, an organization owner adds the connector under **Organization settings →
 Connectors**, and members skip to Step 2. For Claude Code and VS Code, see [Getting started](https://docs.developer.altium.com/platform-mcp-docs/setup/).
 
 ## Step 2: Sign in
 
-1. Under **Customize → Connectors**, click **Connect** on the Altium 365 connector.
-2. Sign in with your Altium account in the browser window that opens, and allow access.
+1. Sign in with your Altium account when Claude opens the sign-in page, and allow access.
+2. If no sign-in page opens, or you are on a Team or Enterprise plan, click **Connect** on the Altium 365 connector
+   under **Customize → Connectors**.
 
 The tools work on your default workspace. To use another one, tell the assistant which, as described in
 [Choosing a workspace](https://docs.developer.altium.com/platform-mcp-docs/setup/#choosing-a-workspace).
