@@ -33,7 +33,7 @@ The same feed the **Project History** panel shows in Altium 365, and the change 
 | Tool | Kind | What it does |
 | --- | --- | --- |
 | `a365_design_projecthistory_list` | Read-only | The history of one or more projects, newest first: commits, releases, copies, MCAD change suggestions, creation, and going online. Each event has its author, date, message and tags, and commits carry their revision id. Filterable by event type, by file, or by free text. 50 events per page by default, up to 100. |
-| `a365_design_projecthistory_details` | Read-only | What one or more commits changed, as recorded by the workspace: components (with the previous designator or comment when renamed), nets, variants, layers, board size, and the files touched. Takes up to 50 commits and describes the first 10; the response lists any it left out. |
+| `a365_design_projecthistory_details` | Read-only | What one or more commits changed, as recorded by the workspace: components (with the previous designator or comment when renamed), nets, variants, layers, board size, and the files touched. Takes up to 50 commits and describes the first 10; the response says how many it reached, so the rest can be asked for in another call. |
 
 A few details that are not obvious from the names:
 
