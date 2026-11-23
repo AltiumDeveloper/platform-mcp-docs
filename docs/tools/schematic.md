@@ -23,8 +23,9 @@ consumers?"* on a 2000-component design without running out of context. The quer
 
 Two things to expect:
 
-- **Component types are a heuristic.** The type histogram and the "IC" or "connector" shortcuts infer a part's type
-  from its name, description and pins. Descriptions, values and pin names are more reliable.
+- **Component types can be approximate.** The type histogram and the "IC" or "connector" shortcuts take a part's type
+  from its tags and folder in the workspace library, and fall back to inferring it from the part's name, description and
+  pins when that lookup fails. Descriptions, values and pin names are more reliable.
 - **Variants change the model.** With a variant named, Not Fitted parts are left out and alternate parts replace the
   originals. Name a revision once without a variant and once per variant to compare them in one call, or use
   [Comparing revisions and variants](#comparing-revisions-and-variants).

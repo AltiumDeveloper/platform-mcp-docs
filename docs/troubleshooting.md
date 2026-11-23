@@ -28,5 +28,5 @@
 | *Design data generation failed* or *was skipped* | That revision has no design data to read. Use another revision. |
 | A variant shows no difference | The variant only overrides parameters, which the design data does not carry. |
 | A pin with a no-connect marker is reported as unconnected | Expected: the design data does not record no-connect markers. |
-| Counts of component types look wrong | Types are inferred from names, descriptions and pins. Ask the assistant to list the parts behind the count, or to check descriptions and values instead. |
+| Counts of component types look wrong | Types come from the workspace library's tags and folders, and are inferred from names, descriptions and pins when that lookup fails. Ask the assistant to list the parts behind the count, or to check descriptions and values instead. |
 | An answer looks plausible but wrong | Ask the assistant to show the rows behind it, or to highlight the parts on the schematic. See [Working with the LLM](./working-with-the-llm.md). |

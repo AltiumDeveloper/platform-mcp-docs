@@ -28,8 +28,8 @@ pull-up resistors"* works when the assistant takes a longer route than you want.
 
 ## Check claims that matter
 
-The data is exact; the assistant's reading of it is not always. Component types are inferred from names and
-descriptions, so a count of "ICs" is approximate. Ask the assistant to show the rows behind a conclusion, or to highlight
+The data is exact; the assistant's reading of it is not always. Component types come from the workspace library
+where it classifies a part, and are otherwise inferred from names and descriptions, so a count of "ICs" is approximate. Ask the assistant to show the rows behind a conclusion, or to highlight
 the parts on the schematic, before you act on it.
 
 ## Approving tool calls
