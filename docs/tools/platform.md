@@ -5,7 +5,7 @@ you are a member of, the assistant passes that workspace's URL with each call; y
 
 | Tool | Kind | What it does |
 | --- | --- | --- |
-| `a365_platform_workspace_list` | Read-only | The Altium 365 workspaces you are a member of: name, URL, whether it is your default, description and location. Filterable by name. |
+| `a365_platform_workspace_list` | Read-only | The Altium 365 workspaces you are a member of: name, URL, whether it is your default, and location, and on request the description. Filterable by name. |
 
 This tool works even when your default workspace lacks the required license, so you can always find a workspace that
 has it.

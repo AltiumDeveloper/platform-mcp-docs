@@ -9,7 +9,7 @@ on the design. Commenting is supported on **schematic documents only**.
 | `a365_collaboration_commentthread_create` | Writes | Starts comment threads on schematic components or nets, named by designator or net name. Up to 50 threads per call. |
 | `a365_collaboration_commentthread_resolve` | Writes | Resolves threads, or reopens resolved ones. |
 | `a365_collaboration_commentthread_delete` | Writes, destructive | Deletes whole threads, with every reply in them. |
-| `a365_collaboration_comment_list` | Read-only | The comments in one or more threads, with their text and authors. |
+| `a365_collaboration_comment_list` | Read-only | The comments in one or more threads, and on request their text and authors. |
 | `a365_collaboration_comment_details` | Read-only | The full details of specific comments, including mentions and the thread's assignee. |
 | `a365_collaboration_comment_create` | Writes | Posts replies to existing threads. |
 | `a365_collaboration_comment_update` | Writes | Replaces the text of existing comments. |
