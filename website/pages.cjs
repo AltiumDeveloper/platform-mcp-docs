@@ -13,7 +13,7 @@ const path = require('node:path');
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 // Altium Developer Center. The pages built from devcenter/ (see devcenter/README.md) are not linked yet: add their
-// URLs here (and the sidebar links and page links listed in OPEN-ISSUES.md) once they are published.
+// URLs here (and the sidebar links and page links listed in docs/OPEN-ISSUES.md) once they are published.
 const DEVELOPER_CENTER = {
   home: 'https://developer.altium.com/',
   docs: 'https://www.altium.com/documentation/altium-developer-center',
@@ -30,7 +30,7 @@ const SECTIONS = [
     label: 'Overview',
     kind: 'guide',
     pages: [
-      { file: 'docs/index.mdx', route: '/', label: 'Overview', description: 'Reference for the Altium 365 MCP Server: tools, sample prompts and guides.' },
+      { file: 'content/index.mdx', route: '/', label: 'Overview', description: 'Reference for the Altium 365 MCP Server: tools, sample prompts and guides.' },
     ],
   },
   {
@@ -38,8 +38,8 @@ const SECTIONS = [
     label: 'Get started',
     kind: 'guide',
     pages: [
-      { file: 'docs/setup.md', route: '/setup/', label: 'Getting started', description: 'Requirements, connecting Claude, Claude Code or VS Code, signing in, and choosing a workspace.' },
-      { file: 'docs/sample-prompts.md', route: '/sample-prompts/', label: 'Try it now', description: 'Prompts to try on a project in your workspace: overview, connectivity, changes, variants and comments.' },
+      { file: 'content/setup.md', route: '/setup/', label: 'Getting started', description: 'Requirements, connecting Claude, Claude Code or VS Code, signing in, and choosing a workspace.' },
+      { file: 'content/sample-prompts.md', route: '/sample-prompts/', label: 'Try it now', description: 'Prompts to try on a project in your workspace: overview, connectivity, changes, variants and comments.' },
     ],
   },
   {
@@ -47,9 +47,9 @@ const SECTIONS = [
     label: 'Guides',
     kind: 'guide',
     pages: [
-      { file: 'docs/working-with-the-llm.md', route: '/working-with-the-llm/', label: 'Working with the LLM', description: 'Good prompts, naming the project, steering tool use and approving tool calls.' },
-      { file: 'docs/how-it-works.md', route: '/how-it-works/', label: 'How it works', description: 'What the server reads, workspaces, revisions and variants, limits, and what it does not do.' },
-      { file: 'docs/security.md', route: '/security/', label: 'Is it safe?', description: 'Sign-in, permissions, the write surface, the sandboxed query tool, and what leaves your workspace.' },
+      { file: 'content/working-with-the-llm.md', route: '/working-with-the-llm/', label: 'Working with the LLM', description: 'Good prompts, naming the project, steering tool use and approving tool calls.' },
+      { file: 'content/how-it-works.md', route: '/how-it-works/', label: 'How it works', description: 'What the server reads, workspaces, revisions and variants, limits, and what it does not do.' },
+      { file: 'content/security.md', route: '/security/', label: 'Is it safe?', description: 'Sign-in, permissions, the write surface, the sandboxed query tool, and what leaves your workspace.' },
     ],
   },
   {
@@ -57,12 +57,12 @@ const SECTIONS = [
     label: 'Tool reference',
     kind: 'tool',
     pages: [
-      { file: 'docs/tools/index.md', route: '/tools/', label: 'All tools', description: 'Tool naming, the arguments every tool shares, and the tool groups.' },
+      { file: 'content/tools/index.md', route: '/tools/', label: 'All tools', description: 'Tool naming, the arguments every tool shares, and the tool groups.' },
       // One page per bounded context, the area in the tool names; the labels and order of the home page cards.
-      { file: 'docs/tools/platform.md', route: '/tools/platform/', label: 'Platform', icon: 'workspace', description: 'The Altium 365 workspaces you can reach, and targeting one of them.' },
-      { file: 'docs/tools/design.md', route: '/tools/design/', label: 'Design', icon: 'design', description: 'Projects, their details, revisions and variants, and their history.' },
-      { file: 'docs/tools/schematic.md', route: '/tools/schematic/', label: 'Schematic', icon: 'schematic', description: 'Schematic data and the query tool, sheet images and highlighting, and comparing revisions and variants.' },
-      { file: 'docs/tools/collaboration.md', route: '/tools/collaboration/', label: 'Collaboration', icon: 'comments', description: 'Altium 365 comment threads and replies on schematic components and nets.' },
+      { file: 'content/tools/platform.md', route: '/tools/platform/', label: 'Platform', icon: 'workspace', description: 'The Altium 365 workspaces you can reach, and targeting one of them.' },
+      { file: 'content/tools/design.md', route: '/tools/design/', label: 'Design', icon: 'design', description: 'Projects, their details, revisions and variants, and their history.' },
+      { file: 'content/tools/schematic.md', route: '/tools/schematic/', label: 'Schematic', icon: 'schematic', description: 'Schematic data and the query tool, sheet images and highlighting, and comparing revisions and variants.' },
+      { file: 'content/tools/collaboration.md', route: '/tools/collaboration/', label: 'Collaboration', icon: 'comments', description: 'Altium 365 comment threads and replies on schematic components and nets.' },
     ],
   },
   {
@@ -70,9 +70,9 @@ const SECTIONS = [
     label: 'Help',
     kind: 'help',
     pages: [
-      { file: 'docs/troubleshooting.md', route: '/troubleshooting/', label: 'Troubleshooting', description: 'Symptoms and fixes for connecting, signing in, workspaces, licensing and answers.' },
-      { file: 'docs/glossary.md', route: '/glossary/', label: 'Glossary', description: 'LLM, MCP, clients and servers, tools, workspaces, revisions, variants and comment threads.' },
-      { file: 'CHANGELOG.md', route: '/changelog/', label: 'Changelog', description: 'What changed in each release of the server, newest first.' },
+      { file: 'content/troubleshooting.md', route: '/troubleshooting/', label: 'Troubleshooting', description: 'Symptoms and fixes for connecting, signing in, workspaces, licensing and answers.' },
+      { file: 'content/glossary.md', route: '/glossary/', label: 'Glossary', description: 'LLM, MCP, clients and servers, tools, workspaces, revisions, variants and comment threads.' },
+      { file: 'content/changelog.md', route: '/changelog/', label: 'Changelog', description: 'What changed in each release of the server, newest first.' },
     ],
   },
 ];

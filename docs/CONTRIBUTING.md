@@ -1,27 +1,19 @@
 # Contributing
 
-Thanks for improving the Altium 365 MCP Server documentation. Read [AGENTS.md](AGENTS.md) first: it says where each kind
-of content goes and the rules each part follows.
+Thanks for improving the Altium 365 MCP Server documentation. Read [AGENTS.md](../AGENTS.md) first: it says where
+each kind of content goes, and each folder's README has the rules for that folder.
 
 ## In short
 
-- **Introduction and quick start** are in [`devcenter/`](devcenter/) and are published on Altium Developer Center.
+- **Introduction and quick start** are in [`devcenter/`](../devcenter/) and are published on Altium Developer Center.
   Keep them stable and link to the reference site by absolute URL.
-- **Everything else** is in [`docs/`](docs/) and is published on the reference site. A new page is listed in
-  [`website/pages.cjs`](website/pages.cjs).
+- **Everything else** is in [`content/`](../content/) and is published on the reference site. A new page is listed
+  in [`website/pages.cjs`](../website/pages.cjs).
 - **Page URLs never change**, because the Developer Center pages link to them.
 
 ## Preview and check
 
-Node 22 or later:
-
-```bash
-cd website
-npm ci
-npm start        # live preview
-npm test         # unit tests
-npm run build    # the CI checks: links, anchors, search index, llms.txt, Developer Center links
-```
+To preview and check your change, see [`website/`](../website/README.md).
 
 ## Pull requests
 

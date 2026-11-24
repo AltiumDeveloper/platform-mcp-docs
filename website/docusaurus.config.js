@@ -1,5 +1,5 @@
 // @ts-check
-// Docusaurus site for docs/, read in place: one docs plugin over the repository root that includes only the pages
+// Docusaurus site for content/, read in place: one docs plugin over the repository root that includes only the pages
 // listed in pages.cjs, so nothing is copied, relative links between the files work as they do on GitHub, and "Edit
 // this page" opens the real source. devcenter/ is not published here; it goes to Altium Developer Center (see
 // devcenter/README.md), and scripts/devcenter-check.mjs checks its links into this site.

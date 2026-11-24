@@ -28,7 +28,7 @@ test('every published page keeps its URL', () => {
 test('every page icon has its rule', () => {
   const css = readFileSync(new URL('../src/css/custom.css', import.meta.url), 'utf8');
   const icons = allPages().map((page) => page.icon).filter(Boolean);
-  const cards = [...readFileSync(new URL('../../docs/index.mdx', import.meta.url), 'utf8').matchAll(/bc-icon bc-([a-z]+)/g)].map((m) => m[1]);
+  const cards = [...readFileSync(new URL('../../content/index.mdx', import.meta.url), 'utf8').matchAll(/bc-icon bc-([a-z]+)/g)].map((m) => m[1]);
   assert.ok(icons.length > 0 && cards.length > 0);
   for (const icon of new Set([...icons, ...cards])) {
     const rule = new RegExp(`\\.bc-${icon} \\{([^}]*)\\}`).exec(css)?.[1];
@@ -117,7 +117,7 @@ test('devcenter check: links into the site must resolve, with their anchors', ()
   assert.match(linkProblem(`${siteUrl}/tools`, options), /trailing-slash/);
   assert.match(linkProblem(`${siteUrl}/missing/`, options), /no page/);
   assert.equal(linkProblem('https://claude.ai/download', options), null);
-  assert.match(linkProblem('../docs/setup.md', options), /absolute URL/);
+  assert.match(linkProblem('../content/setup.md', options), /absolute URL/);
 });
 
 test('search: every tool-page record has its tool group, and the filter keeps only that group', async () => {

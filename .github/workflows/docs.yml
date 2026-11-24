@@ -1,6 +1,6 @@
 name: Docs
 
-# Builds the Docusaurus site in website/ from source (docs/, read in place) and deploys it to GitHub Pages. Nothing
+# Builds the Docusaurus site in website/ from source (content/, read in place) and deploys it to GitHub Pages. Nothing
 # generated is checked in. PRs run the whole build, which fails on broken links or anchors, a search index that points
 # at a missing page or anchor, a broken llms.txt surface, or a Developer Center page (devcenter/) whose links into the
 # site do not resolve; only main deploys.
@@ -10,17 +10,17 @@ on:
   push:
     branches: [main]
     paths:
-      - "docs/**"
+      - "content/**"
       - "devcenter/**"
       - "website/**"
-      - "CHANGELOG.md"
+      - "tools/**"
       - ".github/workflows/docs.yml"
   pull_request:
     paths:
-      - "docs/**"
+      - "content/**"
       - "devcenter/**"
       - "website/**"
-      - "CHANGELOG.md"
+      - "tools/**"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 

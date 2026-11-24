@@ -92,7 +92,7 @@ See [Platform](./tools/platform.md). Administrators can instead confine a connec
 
 ## Updates
 
-Altium updates the server for you, so there is nothing to install or upgrade. The [Changelog](../CHANGELOG.md) lists
+Altium updates the server for you, so there is nothing to install or upgrade. The [Changelog](./changelog.md) lists
 what changed in each release.
 
 ## Check that it works
