@@ -9,7 +9,7 @@ The assistant is instructed to look projects up in each conversation rather than
 
 | Tool | Kind | What it does |
 | --- | --- | --- |
-| `a365_design_project_list` | Read-only | The projects in the workspace, filterable by name and by creation or modification date. 50 per page by default. |
+| `a365_design_project_list` | Read-only | The projects in the workspace, filterable by name and by creation or modification date. 25 per page by default. |
 | `a365_design_project_details` | Read-only | Details of one or more projects in one call: name, description, URL, dates and authors, the variants with their schematic and PCB document ids, and the latest release, plus on request the project parameters and the revision history, newest first. Up to 50 projects per call. |
 | `a365_design_projectvariant_list` | Read-only | The variants of one or more projects, one row per variant, including the base design `[No Variations]`. The schematic tools reject a variant name the project does not declare, so the assistant reads this first. |
 

@@ -317,56 +317,6 @@
   {
     "annotations": {
       "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": false,
-      "readOnlyHint": false,
-      "title": "Edit Comment"
-    },
-    "description": "Edit the text of one or more existing comments. The new text replaces the old text in full. From a365_collaboration_comment_list, pass its threadId as commentThreadId, projectId as entityId, and commentId.",
-    "inputSchema": {
-      "properties": {
-        "comments": {
-          "items": {
-            "properties": {
-              "commentId": {
-                "description": "The comment to edit, as returned by a365_collaboration_comment_list (a GUID).",
-                "type": "string"
-              },
-              "commentThreadId": {
-                "description": "The thread the comment belongs to: the threadId from a365_collaboration_comment_list (a GUID).",
-                "type": "string"
-              },
-              "entityId": {
-                "description": "The GRID of the entity the thread belongs to: the projectId from a365_collaboration_comment_list.",
-                "type": "string"
-              },
-              "text": {
-                "description": "The replacement text. It overwrites the comment's current text in full.",
-                "type": "string"
-              }
-            },
-            "required": [
-              "commentThreadId",
-              "entityId",
-              "commentId",
-              "text"
-            ],
-            "type": "object"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "comments"
-      ],
-      "type": "object"
-    },
-    "name": "a365_collaboration_comment_update",
-    "title": "Edit Comment"
-  },
-  {
-    "annotations": {
-      "destructiveHint": false,
       "idempotentHint": false,
       "openWorldHint": false,
       "readOnlyHint": false,
@@ -728,7 +678,7 @@
       "readOnlyHint": true,
       "title": "List Projects"
     },
-    "description": "Returns a paginated list of design projects visible in the workspace. Supports filtering by name and date ranges, as well as column selection and pagination.\n**Use when:**\n- The user asks to list or discover projects in the Design bounded context.\n- Performing bulk listing, searching or discovery across projects.\n**Do NOT use when:**\n- Fetching full project metadata or payloads for a single project.\n- Performing write/update/delete operations on projects.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.",
+    "description": "Returns a paginated list of design projects visible in the workspace. Supports filtering by name and date ranges, as well as column selection and pagination.\n**Use when:**\n- The user asks to list or discover projects in the Design bounded context.\n- Performing bulk listing, searching or discovery across projects.\n**Do NOT use when:**\n- Fetching full project metadata or payloads for a single project.\n- Performing write/update/delete operations on projects.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (25).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.",
     "inputSchema": {
       "properties": {
         "filter": {

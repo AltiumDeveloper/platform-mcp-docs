@@ -12,7 +12,6 @@ on the design. Commenting is supported on **schematic documents only**.
 | `a365_collaboration_comment_list` | Read-only | The comments in one or more threads, and on request their text and authors. |
 | `a365_collaboration_comment_details` | Read-only | The full details of specific comments, including mentions and the thread's assignee. |
 | `a365_collaboration_comment_create` | Writes | Posts replies to existing threads. |
-| `a365_collaboration_comment_update` | Writes | Replaces the text of existing comments. |
 | `a365_collaboration_comment_delete` | Writes, destructive | Deletes individual replies and keeps the rest of the thread. |
 
 A few details that are not obvious from the names:
