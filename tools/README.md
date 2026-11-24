@@ -17,10 +17,12 @@ disagree.
 `.github/workflows/tool-sync.yml`, run daily at 04:00 UTC or by hand, refreshes the list. When it changed, an agent
 updates the tool pages, the checks run and a second agent reviews the result, and failures go back to the author, for up
 to three rounds in all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync`
-into the branch it ran from. One that could not finish is labelled `needs-human` and asks the maintainers to review; one
-that passed asks no one. It never merges. Its pull request shows a failed Docs check: GitHub holds a run for a pull
-request the workflow's own token opens, and it ends without running. The sync ran the same checks itself, and a person's
-push to the branch starts them for real. A run skips the agents when the open pull request already has the new snapshot.
+into the branch it ran from. One that passed merges itself on a scheduled run, or on a run by hand with `auto_merge`
+set, and a merge into the default branch starts the Docs deploy. One that could not finish, or could not merge, is
+labelled `needs-human` and asks the maintainers to review. Its pull request shows a failed Docs check: GitHub holds a
+run for a pull request the workflow's own token opens, and it ends without running. The sync ran the same checks itself,
+and a person's push to the branch starts them for real. A run skips the agents when the open pull request already has
+the new snapshot.
 
 It needs:
 

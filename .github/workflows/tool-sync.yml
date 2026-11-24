@@ -1,9 +1,14 @@
 name: Tool sync
 
-# Updates the tool pages when production's tools change, through agents and checks, and opens a PR; never merges.
-# Setup (secrets, variable, repo setting) is in tools/README.md.
+# Updates the tool pages when production's tools change, through agents and checks, and opens a PR that merges itself
+# when it passes. Setup and behaviour are in tools/README.md.
 on:
   workflow_dispatch:
+    inputs:
+      auto_merge:
+        description: Merge the PR into the branch the run started from when it passes
+        type: boolean
+        default: false
   # Every day at 04:00 UTC. GitHub runs schedules only from the default branch.
   schedule:
     - cron: "0 4 * * *"
@@ -33,6 +38,8 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      # To start the Docs deploy after a merge, which a merge made with this token does not start on its own.
+      actions: write
     steps:
       # No stored credential, so the agents cannot read the push token from .git/config.
       - uses: actions/checkout@v7
@@ -135,6 +142,9 @@ jobs:
         if: steps.branch.outputs.ours == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          # Scheduled runs merge; a run by hand merges only when asked, so a test cannot merge by surprise.
+          AUTO_MERGE: ${{ github.event_name == 'schedule' || inputs.auto_merge }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           status=$(node -p "require('../.tool-sync/tool-sync-result.json').status")
           git config user.name "github-actions[bot]"
@@ -155,9 +165,22 @@ jobs:
             # The PR targets the branch the run started from, so it carries only this run's commit.
             gh pr create --base "$GITHUB_REF_NAME" --head "$BRANCH" --title "Update the tool reference from production's tools" --body-file ../.tool-sync/tool-sync-pr.md
           fi
-          if [ "$status" = "done" ]; then
-            gh pr edit "$BRANCH" --remove-label needs-human || true
-          else
+          needs_human() {
             gh label create needs-human --color D93F0B --description "The tool sync could not finish on its own" --force
             gh pr edit "$BRANCH" --add-label needs-human --add-reviewer "$REVIEWERS"
+          }
+          if [ "$status" != "done" ]; then
+            needs_human
+          elif [ "$AUTO_MERGE" = "true" ]; then
+            if gh pr merge "$BRANCH" --squash --delete-branch; then
+              echo "Merged into $GITHUB_REF_NAME." | tee -a "$GITHUB_STEP_SUMMARY"
+              if [ "$GITHUB_REF_NAME" = "$DEFAULT_BRANCH" ]; then
+                gh workflow run docs.yml --ref "$GITHUB_REF_NAME"
+              fi
+            else
+              gh pr comment "$BRANCH" --body "The tool sync passed its checks and review, but merging this PR failed, so it needs a person to merge it."
+              needs_human
+            fi
+          else
+            gh pr edit "$BRANCH" --remove-label needs-human || true
           fi
