@@ -44,7 +44,7 @@ const headingText = (heading) => heading
   .replace(/<[^>]+>/g, '')
   .trim();
 
-const FENCE = /^\s*(```|~~~)/;
+export const FENCE = /^\s*(```|~~~)/;
 
 // The page's `# H1`, or null.
 export function pageTitle(source) {

@@ -1,0 +1,1546 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Create Comment"
+    },
+    "description": "Posts one or more new comments to existing comment threads in a single call.\n**Use when:**\n- The user asks to post, add, or write one or more comments to existing threads.\n- The user wants to reply to threads or add notes to multiple discussions at once.\n**Do NOT use when:**\n- Listing or reading comments (use `a365_collaboration_comment_list` instead).\n- Listing comment threads (use `a365_collaboration_commentthread_list` instead).\n- Answering general or conceptual questions about commenting behaviour.",
+    "inputSchema": {
+      "properties": {
+        "comments": {
+          "items": {
+            "properties": {
+              "commentThreadId": {
+                "description": "Comment thread identifier",
+                "type": "string"
+              },
+              "entityId": {
+                "description": "Entity identifier the thread belongs to (e.g., a project ID)",
+                "type": "string"
+              },
+              "text": {
+                "description": "The comment text to post",
+                "type": "string"
+              }
+            },
+            "required": [
+              "commentThreadId",
+              "entityId",
+              "text"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "comments"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_comment_create",
+    "title": "Create Comment"
+  },
+  {
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Delete Comment"
+    },
+    "description": "Permanently delete individual replies from comment threads; the rest of each thread stays. This cannot be undone, so call a365_collaboration_comment_details first to confirm each comment is the one the user means. A thread's first comment is the thread itself and can't be deleted here; delete the whole thread with a365_collaboration_commentthread_delete.",
+    "inputSchema": {
+      "properties": {
+        "comments": {
+          "items": {
+            "properties": {
+              "commentId": {
+                "description": "The reply to delete, as returned by a365_collaboration_comment_list (a GUID).",
+                "type": "string"
+              },
+              "commentThreadId": {
+                "description": "The thread the comment belongs to: the threadId from a365_collaboration_comment_list (a GUID).",
+                "type": "string"
+              },
+              "entityId": {
+                "description": "The GRID of the entity the thread belongs to: the projectId from a365_collaboration_comment_list.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "commentThreadId",
+              "entityId",
+              "commentId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "comments"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_comment_delete",
+    "title": "Delete Comment"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Get Comment Details"
+    },
+    "description": "Returns the full details for one or more comments within project threads. Use for inspection, moderation, or audit.\n**Use when:**\n- The user requests the full or expanded details of one or more comments identified by project, thread, and comment IDs.\n- Inspecting, moderating, or auditing one or more comments.\n**Do NOT use when:**\n- Listing or searching threads across a project (use `a365_collaboration_commentthread_list`).\n- Fetching all comments in a thread (use `a365_collaboration_comment_list`).\n- Answering conceptual questions about commenting behaviour.",
+    "inputSchema": {
+      "properties": {
+        "comments": {
+          "items": {
+            "properties": {
+              "projectId": {
+                "description": "Project identifier",
+                "type": "string"
+              },
+              "threads": {
+                "description": "One or more threads within this project, each with their comment identifiers",
+                "items": {
+                  "properties": {
+                    "commentIds": {
+                      "description": "One or more comment identifiers within this thread",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "threadId": {
+                      "description": "Comment thread identifier",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "threadId",
+                    "commentIds"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "projectId",
+              "threads"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, commentId, text, createdAt, modifiedAt, createdByEmail, modifiedByEmail, mentionsEmails, commentThreadId, assignedToEmail",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "comments"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_comment_details",
+    "title": "Get Comment Details"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "List Comments"
+    },
+    "description": "Retrieves the comments for one or more comment threads in a project. Supports date-range filtering and field selection.\n**Use when:**\n- The user asks to fetch all comments for one or more threads identified by project and thread IDs.\n- The user needs to see the comment text or who posted it (include `text` and `createdByEmail` in the select).\n**Do NOT use when:**\n- Listing threads across a project (use `a365_collaboration_commentthread_list` instead).\n- Fetching only thread summaries without expanding comments.\n- Answering general or conceptual questions about commenting behaviour.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.\n- Note: cursors are only valid for the same filter context. Reusing a cursor from a different filter context produces undefined behaviour.",
+    "inputSchema": {
+      "properties": {
+        "filter": {
+          "default": null,
+          "properties": {
+            "createdAt": {
+              "description": "Filter by creation date range",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "modifiedAt": {
+              "description": "Filter by modification date range",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "page": {
+          "default": null,
+          "properties": {
+            "cursor": {
+              "description": "Cursor from the previous response's pageInfo.nextCursor. Omit for the first page.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "description": "Number of items per page. Required when page is provided.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, threadId, commentId, text, createdAt, modifiedAt, createdByEmail",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "threads": {
+          "items": {
+            "properties": {
+              "projectId": {
+                "description": "Project identifier",
+                "type": "string"
+              },
+              "threadIds": {
+                "description": "One or more comment thread identifiers within this project",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "projectId",
+              "threadIds"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "threads"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_comment_list",
+    "title": "List Comments"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Edit Comment"
+    },
+    "description": "Edit the text of one or more existing comments. The new text replaces the old text in full. From a365_collaboration_comment_list, pass its threadId as commentThreadId, projectId as entityId, and commentId.",
+    "inputSchema": {
+      "properties": {
+        "comments": {
+          "items": {
+            "properties": {
+              "commentId": {
+                "description": "The comment to edit, as returned by a365_collaboration_comment_list (a GUID).",
+                "type": "string"
+              },
+              "commentThreadId": {
+                "description": "The thread the comment belongs to: the threadId from a365_collaboration_comment_list (a GUID).",
+                "type": "string"
+              },
+              "entityId": {
+                "description": "The GRID of the entity the thread belongs to: the projectId from a365_collaboration_comment_list.",
+                "type": "string"
+              },
+              "text": {
+                "description": "The replacement text. It overwrites the comment's current text in full.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "commentThreadId",
+              "entityId",
+              "commentId",
+              "text"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "comments"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_comment_update",
+    "title": "Edit Comment"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Create Comment Thread"
+    },
+    "description": "Creates one or more comment threads on schematic objects in a single call — each entry places a comment on the component or net named by its designator. Commenting is currently supported on schematic documents only. Partial success is possible: each result row shows the designator, the kind it matched (designator or net) and the created commentThreadId (on success), or an error message (on failure). If a name matches an object on more than one sheet, no thread is created for that entry and the result lists the sheets it was found on — re-submit that entry with documentName set to the desired sheet. If a designator is placed more than once on the same sheet, no thread is created for that entry either, and documentName cannot pick between them: the designer must first give each placement a unique designator. Call a365_design_project_list first to get a valid projectId. Each successful result includes a commentThreadId — this is the thread identifier required by all subsequent operations on that comment (for example posting a reply with a365_collaboration_comment_create, or listing threads with a365_collaboration_commentthread_list).",
+    "inputSchema": {
+      "properties": {
+        "threads": {
+          "description": "One or more comment threads to create, each placing a comment on a single schematic object. Up to 50 entries.",
+          "items": {
+            "properties": {
+              "designator": {
+                "description": "The component designator (e.g. \"R1\", \"U3\") or net name (e.g. \"GND\", \"CAN_H\") to attach the comment to. Matched as a designator first, then as a net. Pin identifiers are not supported. A comment on a net is anchored to the components carrying its pins on the chosen sheet.",
+                "type": "string"
+              },
+              "documentName": {
+                "description": "Schematic sheet file name to disambiguate when the name matches an object on multiple sheets (e.g. \"Sheet1.SchDoc\"). Required only when a previous call reported the object on multiple sheets.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "description": "Project identifier returned by a365_design_project_list IN THIS CONVERSATION. Never infer, recall, or reuse a projectId from memory or a previous conversation — if a365_design_project_list has not been called yet in this conversation, call it now.",
+                "type": "string"
+              },
+              "text": {
+                "description": "Comment text to post on the object.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Optional. What designator names: 'Component' or 'Net' (case-insensitive). Omit to try a component, then a net; set it when a name is both a designator and a net. Pins can't take comments, so name the component.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId",
+              "designator",
+              "text"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "threads"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_commentthread_create",
+    "title": "Create Comment Thread"
+  },
+  {
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Delete Comment Thread"
+    },
+    "description": "Permanently delete whole comment threads, including every reply in them. This is the correct tool when the user asks to delete a comment created with a365_collaboration_commentthread_create. Get each commentThreadId from a365_collaboration_commentthread_list if you do not have it. This cannot be undone, so read each thread with a365_collaboration_comment_list first to confirm it is the one the user means. To remove a single reply and keep the thread, use a365_collaboration_comment_delete. To close a thread without deleting it, use a365_collaboration_commentthread_resolve.",
+    "inputSchema": {
+      "properties": {
+        "threads": {
+          "items": {
+            "properties": {
+              "commentThreadId": {
+                "description": "The thread to delete, as returned by a365_collaboration_commentthread_list or a365_collaboration_commentthread_create (a GUID).",
+                "type": "string"
+              },
+              "entityId": {
+                "description": "The GRID of the entity the thread belongs to: the projectId from a365_collaboration_commentthread_list.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "commentThreadId",
+              "entityId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "threads"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_commentthread_delete",
+    "title": "Delete Comment Thread"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "List Comment Threads"
+    },
+    "description": "Retrieves comment threads for one or more projects in a single call. Supports date-range, status and assignee filtering, and pagination.\n**Use when:**\n- The user asks to list or search comment threads within one or more projects.\n- Bulk/list operations, discovery, or narrow date-scoped queries on comment threads.\n**Do NOT use when:**\n- Fetching full thread messages or expanding a single thread's contents.\n- Answering conceptual questions about commenting behaviour.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.\n- Note: cursors are only valid for the same filter context. Reusing a cursor from a different filter context produces undefined behaviour.",
+    "inputSchema": {
+      "properties": {
+        "filter": {
+          "default": null,
+          "properties": {
+            "assignedTo": {
+              "description": "Filter to threads assigned to this user, matched on their email address (case-insensitive). Omit to include all.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "createdAt": {
+              "description": "Filter by creation date range",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "modifiedAt": {
+              "description": "Filter by this thread's modification date range, does not reflect recent comment activity.",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "status": {
+              "description": "Filter to threads with this status: 'Active' or 'Resolved' (case-insensitive). Omit to include both.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "page": {
+          "default": null,
+          "properties": {
+            "cursor": {
+              "description": "Cursor from the previous response's pageInfo.nextCursor. Omit for the first page.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "description": "Number of items per page. Required when page is provided.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "projectIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, commentThreadId, threadNumber, status, createdAt, modifiedAt, assignedTo, createdBy, modifiedBy",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "projectIds"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_commentthread_list",
+    "title": "List Comment Threads"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "title": "Resolve or Reopen Comment Thread"
+    },
+    "description": "Resolve (close) or reopen one or more comment threads by setting status to 'Resolved' or 'Active'. Use the commentThreadId from a365_collaboration_commentthread_list, and its projectId as entityId. To remove a thread entirely, use a365_collaboration_commentthread_delete.",
+    "inputSchema": {
+      "properties": {
+        "threads": {
+          "items": {
+            "properties": {
+              "commentThreadId": {
+                "description": "The comment thread to update, as returned by a365_collaboration_commentthread_list (a GUID).",
+                "type": "string"
+              },
+              "entityId": {
+                "description": "The GRID of the entity the thread belongs to: the projectId from a365_collaboration_commentthread_list.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Target status: 'Resolved' to resolve the thread or 'Active' to reopen it (case-insensitive).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "commentThreadId",
+              "entityId",
+              "status"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "threads"
+      ],
+      "type": "object"
+    },
+    "name": "a365_collaboration_commentthread_resolve",
+    "title": "Resolve or Reopen Comment Thread"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Get Project Details"
+    },
+    "description": "Retrieves detailed information for one or more design projects in a single call.\nReturns a flat table with one row per project including document IDs for schematic and PCB variants\nand the latest release — ready to use as inputs for a365_collaboration_commentthread_create.\n**Use when:**\n- The user asks for details, metadata, or document IDs for one or more specific projects.\n- You need to resolve project document IDs before creating comment threads.\n**Do NOT use when:**\n- Listing or searching projects by criteria (use a365_design_project_list instead).\n- Answering general conceptual questions about projects.\n**Revision history:**\n- Select the opt-in `revisions` column to get a project's VCS history as a single newest-first array (index 0 = newest).\n- With no `page`, `revisions` returns the 3 newest. Set `page.pageSize` for more; with a single projectId follow `page.nextCursor` to walk the whole history newest→oldest.",
+    "inputSchema": {
+      "properties": {
+        "page": {
+          "default": null,
+          "properties": {
+            "cursor": {
+              "description": "Cursor from the previous response's pageInfo.nextCursor. Omit for the first page.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "description": "Number of items per page. Required when page is provided.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "projectIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Tokens controlling which columns are returned. Individual fields: id, name, description, url, createdAt, updatedAt, createdBy, updatedBy. Area tokens (each expands to multiple columns): variants, latestRelease, parameters, and revisions — opt-in VCS history as a single newest-first array column (index 0 = newest). Selecting revisions returns the 3 newest by default; use the page parameter to fetch more.",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "projectIds"
+      ],
+      "type": "object"
+    },
+    "name": "a365_design_project_details",
+    "title": "Get Project Details"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "List Projects"
+    },
+    "description": "Returns a paginated list of design projects visible in the workspace. Supports filtering by name and date ranges, as well as column selection and pagination.\n**Use when:**\n- The user asks to list or discover projects in the Design bounded context.\n- Performing bulk listing, searching or discovery across projects.\n**Do NOT use when:**\n- Fetching full project metadata or payloads for a single project.\n- Performing write/update/delete operations on projects.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.",
+    "inputSchema": {
+      "properties": {
+        "filter": {
+          "default": null,
+          "properties": {
+            "createdAt": {
+              "description": "Filter by creation date range",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "modifiedAt": {
+              "description": "Filter by modification date range",
+              "properties": {
+                "gte": {
+                  "description": "Greater than or equal to this date (ISO 8601 format, e.g. \"2025-01-15T00:00:00Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lte": {
+                  "description": "Less than or equal to this date (ISO 8601 format, e.g. \"2025-06-30T23:59:59Z\")",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "name": {
+              "description": "Filter by project name (case-insensitive substring match). Plain string value only — do not pass an operator object.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "page": {
+          "default": null,
+          "properties": {
+            "cursor": {
+              "description": "Cursor from the previous response's pageInfo.nextCursor. Omit for the first page.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "description": "Number of items per page. Required when page is provided.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, name, createdAt, modifiedAt",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "a365_design_project_list",
+    "title": "List Projects"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Get Commit Changes"
+    },
+    "description": "Lists what one or more commits changed, as recorded by the workspace: `components` (designator and comment, plus the previous value when renamed or re-valued), `nets`, `variants`, `layers`, `boardSizeChanged` and the affected `files`. Every entry carries `change` — Added, Deleted or Modified.\nAsk for every commit you need in ONE call: describing several costs the same as one.\nGet the RevisionIds from a365_design_projecthistory_list or the `revisions` column of a365_design_project_details.\nA component entry that names a variant changed only in that variant.\n**Do NOT use when:** the question is about parameters, MPNs, footprints, pins, wiring or sheet structure, or about the difference between two revisions that are not adjacent. The record covers neither.\nUse a365_schematic_diff_details instead: it compares the two design states field by field, for any two revisions.\nNOTE: this is the record of each commit taken on its own, so the entries of several commits do not add up to the difference between two design states.\nNOTE: the record's status is 'Ready' when it is complete, 'Processing' right after a commit, 'NotAvailable' for a commit made before the workspace recorded changes — the change lists are empty unless it is 'Ready'.\nNOTE: revisions the workspace does not know are reported as not found instead of failing the call.\nNOTE: a batch is cut short when the described commits get too large (a project's first commit alone lists every component and net) — the response then says how many were described.",
+    "inputSchema": {
+      "properties": {
+        "revisions": {
+          "description": "Commits to describe, grouped by the project they belong to — one entry per project, each naming that project's revisionIds. Up to 50 revisionIds across all entries.",
+          "items": {
+            "properties": {
+              "projectId": {
+                "description": "Project identifier returned by a365_design_project_list IN THIS CONVERSATION. Never infer, recall, or reuse a projectId from memory or a previous conversation — if a365_design_project_list has not been called yet in this conversation, call it now.",
+                "type": "string"
+              },
+              "revisionIds": {
+                "description": "RevisionIds of the commits to describe. Pass all of them at once; at most 10 commits are described per call, counted across every entry.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "projectId",
+              "revisionIds"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, revisionId, author, createdAt, message, status, files, components, nets, variants, layers, boardSizeChanged, tags",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "revisions"
+      ],
+      "type": "object"
+    },
+    "name": "a365_design_projecthistory_details",
+    "title": "Get Commit Changes"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "List Project History"
+    },
+    "description": "Lists everything that happened to a project in its Altium 365 workspace, newest first — the same feed the Project History panel shows: commits, releases, copies, MCAD change suggestions, project creation and going online.\nEach event carries `projectId`, `type`, `createdAt`, `author`, `message` and `tags`, plus what its kind has: `revisionId` and `files`/`changes` for a commit, `releases` for a release, `copiedFrom`/`copiedTo` for a copy, `simulationDataUrl` for simulation results.\n**Use when:** the question is what happened to the project — who released, copied or committed what, and when.\n**Do NOT use when:** you only need the revisions themselves to read or compare — select the `revisions` column of a365_design_project_details instead.\nNOTE: only commits carry a revision id; pass those to a365_design_projecthistory_details for the changed designators and net names.\nNOTE: an author the workspace anonymised is flagged as masked, so the name shown is not a real user name.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required, and accepts 1 to 100.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.\n- A cursor addresses one project's feed, so page.cursor requires exactly one entry in projectIds. pageSize applies per project.\n- Only the newest 500 events of a project are reachable. Past that the response reports the ceiling instead of an empty page — narrow with eventTypes, filePath or search rather than paging further.",
+    "inputSchema": {
+      "properties": {
+        "filter": {
+          "default": null,
+          "properties": {
+            "eventTypes": {
+              "description": "Restrict the feed to these kinds: ProjectCreated, ProjectCloned, ProjectCommitted, ProjectReleased, MCADChangesSuggested, ProjectMadeAvailableOnline, MCADChangesAccepted. Omit for everything except MCADChangesAccepted, which the panel also hides.",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            },
+            "filePath": {
+              "description": "Return only events that changed this document, e.g. '3_power.SchDoc'. Use a path exactly as returned in the event's file list — a partial or renamed path matches nothing.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "search": {
+              "description": "Return only events matching this text. Matched case-insensitively against author, event kind, message, tags, released item ids, file paths, component designators and comments, and net, variant and layer names.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "page": {
+          "default": null,
+          "properties": {
+            "cursor": {
+              "description": "Cursor from the previous response's pageInfo.nextCursor. Omit for the first page.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "description": "Number of items per page. Required when page is provided.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "projectIds": {
+          "description": "Project identifiers returned by a365_design_project_list IN THIS CONVERSATION. Never infer, recall, or reuse a projectId from memory or a previous conversation — if a365_design_project_list has not been called yet in this conversation, call it now. Pass every project you need in one call; at most 50 per call.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, type, eventId, createdAt, author, isAuthorMasked, message, revisionId, files, changes, releases, copiedFrom, copiedTo, simulationDataUrl, tags",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "projectIds"
+      ],
+      "type": "object"
+    },
+    "name": "a365_design_projecthistory_list",
+    "title": "List Project History"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "List project design variants"
+    },
+    "description": "Returns each project's design configurations (variants) as one row per variant, including '[No Variations]' — the base, un-varied design — flagged by isBaseDesign. Call this before any schematic query so variantName carries a value the project actually declares: the schematic tools reject an unrecognised name rather than falling back to the base design. There is no 'currently active' variant in a cloud workspace, so when the user has not named one, use the base design; ask them to choose only when several named variants exist and their intent is ambiguous. Batch every project you need in one call.",
+    "inputSchema": {
+      "properties": {
+        "projectIds": {
+          "description": "Project GRID identifiers returned by a365_design_project_list IN THIS CONVERSATION. Batch every project you need in one call. Never infer, recall, or reuse a projectId from memory or a previous conversation — if a365_design_project_list has not been called yet in this conversation, call it now.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, name, isBaseDesign. Omit for all three — the list is short and 'name' alone loses which project a variant belongs to when batching.",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "projectIds"
+      ],
+      "type": "object"
+    },
+    "name": "a365_design_projectvariant_list",
+    "title": "List project design variants"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Compare schematic revisions"
+    },
+    "description": "Compares the schematic of two revisions of a project and returns, per compared pair, what differs: the components added, deleted or modified with every changed field, parameter and pin net, before and after; the nets added, deleted or modified with the pins they gained and lost; and, on request, the parts that share a signal net with a change.\nAny two revisions compare, not only adjacent commits, because the two design states themselves are compared. Without a baseRevisionId the commit before revisionId is the base, and the row says which it was.\n**Use when:** the question is what changed between two revisions or in one commit — parameters, MPNs, footprints, values, pins or wiring — or a review should look only at what changed and at what it touches.\n**Do NOT use when:** only who committed what and when is asked — use a365_design_projecthistory_list; or one revision is analysed on its own — use a365_schematic_summary_details or a365_schematic_script_run.\nAsk for every pair you need in ONE call, up to 10.\nNOTE: a project's first commit has no previous revision: its row has a null baseRevisionId and empty changes, with a no_previous_revision warning.\nNOTE: components are matched by their placement in the design, so a renamed component is one Modified entry with oldDesignator; components sharing a designator are matched in their order. Nets are matched by name, so a renamed net is a Deleted and an Added one.\nNOTE: an unmanaged part's MPN and description are among its parameters, not its fields.\nThis tool is read-only and has no side effects.",
+    "inputSchema": {
+      "properties": {
+        "comparisons": {
+          "description": "Pairs of revisions grouped by project: one entry per project and variant, each naming its pairs. At most 10 pairs across all entries.",
+          "items": {
+            "properties": {
+              "projectId": {
+                "description": "Project identifier returned by a365_design_project_list IN THIS CONVERSATION. Never infer, recall, or reuse a projectId from memory or a previous conversation — if a365_design_project_list has not been called yet in this conversation, call it now.",
+                "type": "string"
+              },
+              "revisions": {
+                "description": "The pairs to compare in this project: each a revisionId and an optional baseRevisionId.",
+                "items": {
+                  "properties": {
+                    "baseRevisionId": {
+                      "description": "Revision to compare with. Omit to compare with the commit before revisionId.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "revisionId": {
+                      "description": "Revision to compare, from a365_design_projecthistory_list or the `revisions` column of a365_design_project_details.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "revisionId"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "variantName": {
+                "description": "Variant to compare the revisions in, from a365_design_projectvariant_list. Omit for the base design.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId",
+              "revisions"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, baseRevisionId, revisionId, variantName, componentCount, components, nets, neighbours. neighbours is returned only when selected.",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "comparisons"
+      ],
+      "type": "object"
+    },
+    "name": "a365_schematic_diff_details",
+    "title": "Compare schematic revisions"
+  },
+  {
+    "_meta": {
+      "ui": {
+        "resourceUri": "ui://altium-image-viewer/app"
+      }
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Highlight Schematic Objects"
+    },
+    "description": "Locates schematic objects on one or more Altium 365 design revisions and returns an image of each one framed in its schematic context, plus an interactive card showing the full sheet. Give the design(s) in `schematics` (project + optional revisions; omit revisions for the latest) and the objects in `designators` — each entry is a component designator (e.g. \"U1\", \"C3\") or a net name (e.g. \"GND\", \"CAN_H\"), matched as a designator first, then as a net. EVERY occurrence is returned: a component placed on several sheets yields one image per sheet, and a net one per sheet it reaches. `data.terms[]` reports, per entry, what it matched and every sheet it was found on with its placement or pin count and whether that sheet was rendered — read it to see the full extent even when images were capped. A net spanning many sheets renders only its highest-pin-count sheets; narrow with the ref's documentIds/sheetNames for the rest. Use this to SEE a part or net in context; for whole sheets use a365_schematic_screenshot_capture, and for part data (MPN, pins, parameters) query a365_schematic_script_run. Names matching neither a component nor a net are reported. Images render the variant named in `variantName`, or the base design when it is omitted; a `variantName` the revision doesn't declare is rejected, and each image also reports how that variant treats the component in `variation`. A sheet the variant could not be applied to is reported as a warning and its caption says so: that image may show every variant's overlays at once, so read fitment from `variation`, not from it. The card (scrollable strip + an \"Open in Altium 365\" deep-link) also covers hosts that don't show inline images.",
+    "inputSchema": {
+      "properties": {
+        "designators": {
+          "description": "Objects to locate: component designators (e.g. \"U1\", \"C3\") or net names (e.g. \"GND\", \"CAN_H\"). Each is matched as a designator first, then as a net. Case-insensitive.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "format": {
+          "default": null,
+          "description": "ADVANCED — leave unset unless the user explicitly asks for a specific image format; changing it is rarely needed and can reduce accuracy. 'webp' (default) is best for reading the schematic; 'png' is lossless, for when the user wants the image itself to save or reuse elsewhere; 'jpeg' is widely compatible. Only set when the user specifically requests a format.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "includeCard": {
+          "default": true,
+          "description": "ADVANCED — leave true. The interactive card is how the user views the highlighted components, and it no longer costs response payload (its images are fetched on demand). Set false only if the user wants the raw inline crop(s) with no viewer attached.",
+          "type": "boolean"
+        },
+        "padding": {
+          "default": null,
+          "description": "Optional. SVG-space padding left around the component (0–500, default 100) — sets how tightly the returned image is cropped and the card's initial zoom; the card can still zoom out to the whole sheet. Lower = tighter framing. Leave unset unless the user asks to adjust the default framing.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "quality": {
+          "default": null,
+          "description": "ADVANCED — leave unset. Defaults to 'medium', tuned so small text stays legible. Only change if the user explicitly asks: 'low' fits more components in one response but small text may be unreadable; 'high' returns a SINGLE maximum-detail image (WebP 'high' is lossless) — for one component the user wants sharp or to reuse elsewhere, so request one designator with it. The interactive card is still shown. Changing this can reduce accuracy.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schematics": {
+          "description": "Design projects (and optional revisions) whose sheets are searched for the designators.",
+          "items": {
+            "properties": {
+              "documentIds": {
+                "description": "Optional document IDs to restrict results to specific sheets. Use documentId values from a365_schematic_summary_details to target individual sheets. When null or empty, all sheets are returned.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "description": "Project GRID identifier (required).",
+                "type": "string"
+              },
+              "revisionIds": {
+                "description": "One or more commit-hash revision IDs to fetch. Null or empty means the latest revision. Each entry must be a non-empty string — null entries are rejected (use null/omit for the whole array if you want \"latest\"). The internal \"use latest\" sentinel produced by EffectiveRevisionIds is intentionally hidden from callers.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "sheetNames": {
+                "description": "Optional sheet names to render, e.g. [\"4_cpu.SchDoc\"]. Case-insensitive; the .SchDoc extension is optional. Omit or leave empty to render every sheet. Use documentName values from a365_schematic_summary_details. Combined with documentIds this is a union, not an intersection: both sets of sheets are rendered, so name a sheet in one filter or the other, not both.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "variantName": {
+                "description": "Optional project variant name. When set, the schematic reflects that variant. The text tools exclude its Not Fitted components; the image tools draw them greyed and crossed instead, and a365_schematic_object_highlight reports the treatment per component in `variation`. Null or empty (the default) yields the base, un-varied design.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schematics",
+        "designators"
+      ],
+      "type": "object"
+    },
+    "name": "a365_schematic_object_highlight",
+    "title": "Highlight Schematic Objects"
+  },
+  {
+    "_meta": {
+      "ui": {
+        "resourceUri": "ui://altium-image-viewer/app"
+      }
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Capture a screenshot of a schematic view"
+    },
+    "description": "Renders the schematic sheets of one or more Altium 365 design revisions as images, returned inline. Accepts a batch: each entry is a project plus optional revision IDs (omit for the latest) and an optional sheetNames filter (omit to render every sheet), so you can request, e.g., every sheet of two revisions of one project and just one named sheet of another. A visual SUPPLEMENT to the text schematic tools (a365_schematic_summary_details / a365_schematic_script_run) — call those first for counts, connectivity, and part data; use this when the user wants to SEE the schematic or asks about visual content the netlist can't express (notes, annotations, layout). Images render the variant named in an entry's variantName, or the base design when it is omitted. A sheet the variant could not be applied to is reported as a warning and its caption says so: that image may show every variant's overlays at once, so do not read component fitment from it. To zoom in on a single component, use a365_schematic_object_highlight. Alongside the inline images the tool returns an interactive card (scrollable sheet strip + an \"Open in Altium 365\" button) so hosts that don't display inline images can still show them.",
+    "inputSchema": {
+      "properties": {
+        "format": {
+          "default": null,
+          "description": "ADVANCED — leave unset unless the user explicitly asks for a specific image format; changing it is rarely needed and can reduce accuracy. 'webp' (default) is best for reading the schematic; 'png' is lossless, for when the user wants the image itself to save or reuse elsewhere; 'jpeg' is widely compatible. Only set when the user specifically requests a format.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "includeCard": {
+          "default": true,
+          "description": "ADVANCED — leave true. The interactive card is how the user views the images. Set false only if the user wants the raw inline image(s) with no viewer attached.",
+          "type": "boolean"
+        },
+        "quality": {
+          "default": null,
+          "description": "ADVANCED — leave unset. Defaults to 'medium', tuned so small text stays legible across a handful of sheets. Only change if the user explicitly asks: 'low' fits more sheets in one response for an overview but small text may be unreadable; 'high' returns a SINGLE maximum-detail image (WebP 'high' is lossless) — for one specific sheet the user wants sharp or to reuse elsewhere, so pair it with a sheetNames filter to pick that sheet. The interactive card is still shown. Changing this can reduce accuracy.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schematics": {
+          "description": "Design projects (and optional revisions) to capture. One or more; each renders its schematic sheets — all of them, or only those named in sheetNames.",
+          "items": {
+            "properties": {
+              "documentIds": {
+                "description": "Optional document IDs to restrict results to specific sheets. Use documentId values from a365_schematic_summary_details to target individual sheets. When null or empty, all sheets are returned.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "description": "Project GRID identifier (required).",
+                "type": "string"
+              },
+              "revisionIds": {
+                "description": "One or more commit-hash revision IDs to fetch. Null or empty means the latest revision. Each entry must be a non-empty string — null entries are rejected (use null/omit for the whole array if you want \"latest\"). The internal \"use latest\" sentinel produced by EffectiveRevisionIds is intentionally hidden from callers.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "sheetNames": {
+                "description": "Optional sheet names to render, e.g. [\"4_cpu.SchDoc\"]. Case-insensitive; the .SchDoc extension is optional. Omit or leave empty to render every sheet. Use documentName values from a365_schematic_summary_details. Combined with documentIds this is a union, not an intersection: both sets of sheets are rendered, so name a sheet in one filter or the other, not both.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "variantName": {
+                "description": "Optional project variant name. When set, the schematic reflects that variant. The text tools exclude its Not Fitted components; the image tools draw them greyed and crossed instead, and a365_schematic_object_highlight reports the treatment per component in `variation`. Null or empty (the default) yields the base, un-varied design.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schematics"
+      ],
+      "type": "object"
+    },
+    "name": "a365_schematic_screenshot_capture",
+    "title": "Capture a screenshot of a schematic view"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "Execute JavaScript query against schematic model"
+    },
+    "description": "Executes a JavaScript function body against the schematic semantic model for one or more design revisions and returns the result, serialised as JSON in one output row per revision.\nSTOP — before running any script you MUST have already called a365_schematic_summary_details for this project/revision in the current conversation. Its overview (sheets, component property names, type histogram) is the context every script is written against; scripting a revision you have not summarised is an error even when the result looks plausible. If you have not summarised it yet, call a365_schematic_summary_details first, then run your script.\nUse this to answer specific questions WITHOUT fetching the full netlist/library.\nOnly infer component or net meaning based on naming conventions if information isn't available through properties of this data model.\nTry to compose the whole answer using a single script if possible, don't run multiple small pieces.\n\n=== GLOBAL VARIABLE ===\n  Schematic   (always available — primary collections are real JS arrays)\n  CT          (ComponentType constants — CT.IC, CT.Connector, CT.Resistor, etc.)\n\n=== Schematic MEMBERS ===\nAll collections are plain JS arrays — use .filter(), .map(), .find(), .length etc. directly:\n  .Components   — all placed component instances (Component[])\n  .Nets         — all nets, power and signal (Net[])\n  .Library      — unique part definitions (LibraryComponent[])\n  .Sheets       — root schematic sheets, hierarchy via Children (Sheet[])\n  .NetClasses   — net classes with their member nets (NetClass[])\nFiltered shortcuts (also plain JS arrays):\n  .ICs          — Components where library Type == CT.IC\n  .Connectors   — Components where library Type == CT.Connector\n  .PowerNets    — nets that carry power (including ground)\n  .SignalNets   — nets that carry signals\n  .DiffPairs    — nets where IsDiffPair == true\nLookup methods:\n  .Component(\"U1\")              — Component by Id, else by designator\n  .Net(\"SPI1_CLK\")              — Net by net name\n  .NetClass(\"DDR3\")             — NetClass by name\n  .LibraryFor(component)        — LibraryComponent for a Component\n  .Property(component, \"MPN\")   — property string value\n  .Mpn(component)               — manufacturer part number\n\n=== Component FIELDS ===\n  string          Id           equals Designator unless several components share it: then \"R5\", \"R5#2\"…, as named in PinConnection.Designator\n  string          Designator   e.g. \"U3\"\n  string          Value        e.g. \"STM32F405RGT6\" MAY be null — if so, resolve in order: Parameters \"Value\" ?? \"Value 1\" ?? Comment ?? Description\n  string          Sheet        e.g. \"MCU\" — matches the sheet names in a365_schematic_summary_details.Sheets; use that outline to roll up by functional block\n  string          Footprint    current PCB footprint name, e.g. \"RESC1005X40N\" (null if none assigned)\n  number          LibraryId    links to LibraryComponent.Id\n  ComponentPin[]  Pins         — plain JS array, use .filter()/.map() directly\n  Parameter[]     Parameters   — plain JS array\n\n=== ComponentPin FIELDS ===\n  string Number     e.g. \"14\"\n  string Name       e.g. \"PA5\"\n  string Net        e.g. \"SPI1_CLK\"  (null = not on any net: unconnected or No-Connect, not told apart)\n  string Direction  \"In\"|\"Out\"|\"BiDir\"|\"Pwr\"|\"OC\"|\"OE\"|\"HiZ\"|\"Passive\"\n\n=== LibraryComponent FIELDS ===\n  number      Id\n  string      Description\n  bool        IsPassive\n  number      Type             — compare with CT.IC, CT.Connector etc. (HEURISTIC, may be wrong)\n  string[]    PinsDefinitions  — plain JS array, \"Name(Dir)\" strings, not connectivity\n  Parameter[] Parameters       — plain JS array\n  string      Mpn              (null if absent)\n\n=== Parameter FIELDS ===\n  string  Name\n  string  Value\n\n=== Net FIELDS ===\n  string          Name               NOT unique — .Net() returns one, use Nets.filter() for all\n  number          Scope              0 local to one sheet, 1 sheet interface, 2 global, -1 unknown\n  bool            IsPower\n  bool            IsDiffPair\n  string          DiffPairName       e.g. \"USB_D\" (empty if not part of a differential pair)\n  string[]        NetClasses         net class names this net belongs to, e.g. [\"DDR3\",\"HighSpeed\"]\n  string[]        DiffPairClasses    differential-pair class names, e.g. [\"LVDS\"]\n  PinConnection[] Pins   — plain JS array\n\n=== PinConnection FIELDS ===\n  string Designator   Component.Id, e.g. \"U3\" (\"R5#2\" for a shared designator) — pass to .Component()\n  string PinNumber    e.g. \"14\"\n  string PinName      e.g. \"PA5\"\n\n=== NetClass FIELDS ===\n  string   Name   e.g. \"DDR3\"\n  string[] Nets   member net names — resolve details via .Net(name)\n\n=== Sheet FIELDS ===\n  string  Name       sheet title, e.g. \"MCU\" — same value as Component.Sheet\n  string  FileName   e.g. \"MCU.SchDoc\"\n  string  DocumentId stable sheet id, e.g. \"OTZQBXYK\" — pass to documentIds to scope a query\n  Sheet[] Children   sub-sheets (recursive; empty array for leaf sheets — a repeated (multi-channel) sub-sheet appears under each parent that references it)\n\n=== CT (ComponentType) CONSTANTS ===\nUse CT.IC, CT.Connector, CT.Resistor, CT.Capacitor, CT.Diode etc. in Type comparisons.\nFull list: Unknown, Antenna, Amplifier, Battery, Bridge, Buzzer, Cable, Capacitor, Connector,\nCrystal, DataConverter, Diode, Display, Filter, Ferrite, Fiducial, Fuse, IC, Inductor,\nInterface, LED, Logic, Mechanical, Memory, MetalScreeningBox, Meter, Microphone, Motor,\nOscillator, PCBModule, PowerSupply, Relay, Resistor, Speaker, Switch, TestPoint, Thermistor,\nTransformer, Transistor, VacuumTube, Varistor, SteelSpacer, NetTie, Graphical\n\nHEURISTIC WARNING: ComponentType is inferred from name/description/pin count.\nIt is NOT reliable — if Description, Value, designator prefix, or pin names (SDA/SCL = I2C,\nMOSI/MISO = SPI) suggest a different function, trust those over Type.\n\n=== SCRIPT RULES ===\n- Write a JavaScript function body. Use `return` to send back the result.\n- Return a string for text answers, a plain JS object/array for structured data.\n- Do NOT include comments (// or /* */) — they waste tokens without adding value.\n- The returned value is serialised to JSON for transport and truncated at 64,000 characters — return only what you need.\n\n=== NULL SAFETY — MANDATORY ===\n- .Component(), .Net(), .LibraryFor() return undefined if not found — always guard:\n    const u1 = Schematic.Component(\"U1\");\n    if (!u1) return \"U1 not found\";           ← correct\n    Schematic.Component(\"U1\").Pins            ← crashes if U1 not found\n- Use optional chaining: Schematic.LibraryFor(c)?.Type\n- ComponentPin.Net is null for pins not on any net — filter with: c.Pins.filter(p => p.Net)\n\n=== EMPTY RESULT RULE — MANDATORY ===\nIf an empty result would be surprising, add a diagnostic fallback:\n  const hits = Schematic.Components.filter(c => ...);\n  if (!hits.length)\n      return `No matches. Total: ${Schematic.Components.length}, ` +\n             `sample: ${Schematic.Components.slice(0,5).map(c => c.Designator).join(', ')}`;\n  return hits.map(c => ({ Designator: c.Designator, Value: c.Value }));\n\n=== EXAMPLES ===\nreturn `Components: ${Schematic.Components.length}, Nets: ${Schematic.Nets.length}`;\n\nconst ics = Schematic.ICs;\nif (!ics.length) return \"No ICs found — verify ComponentType values via a365_schematic_summary_details\";\nconst ic = ics.reduce((a, b) =>\n    (Schematic.LibraryFor(a)?.PinsDefinitions ?? []).length >= (Schematic.LibraryFor(b)?.PinsDefinitions ?? []).length ? a : b);\nreturn `${ic.Designator} (${ic.Value}) — ${(Schematic.LibraryFor(ic)?.PinsDefinitions ?? []).length} pins`;\n\nreturn Schematic.PowerNets\n    .sort((a, b) => a.Name.localeCompare(b.Name))\n    .map(net => {\n        const consumers = [...new Set(net.Pins.map(p => p.Designator))];\n        return `${net.Name}: ${consumers.length} consumers — ${consumers.slice(0,5).join(', ')}${consumers.length > 5 ? '...' : ''}`;\n    }).join('\\n');\n\nreturn Schematic.ICs.map(ic => ({\n    Designator: ic.Designator,\n    Value: ic.Value,\n    Sheet: ic.Sheet,\n    Nets: [...new Set(ic.Pins.map(p => p.Net).filter(Boolean))].sort()\n})).sort((a, b) => a.Designator.localeCompare(b.Designator));\n\nconst net = Schematic.Net(\"SPI1_CLK\");\nif (!net) return \"Net not found\";\nconst getDir = p => Schematic.Component(p.Designator)?.Pins.find(x => x.Number === p.PinNumber)?.Direction;\nreturn {\n    Net: net.Name,\n    Drivers:   net.Pins.filter(p => getDir(p) === \"Out\").map(p => `${p.Designator}.${p.PinName}`),\n    Receivers: net.Pins.filter(p => getDir(p) === \"In\").map(p => `${p.Designator}.${p.PinName}`)\n};\n\nconst pairs = {};\nSchematic.DiffPairs.forEach(n => (pairs[n.DiffPairName] ??= []).push(n.Name));\nreturn Object.entries(pairs).map(([pair, nets]) => `${pair}: ${nets.join(', ')}`);",
+    "inputSchema": {
+      "properties": {
+        "code": {
+          "description": "A JavaScript function body evaluated against the schematic data model. Multiple statements, local variables and loops are allowed; finish with 'return <value>;' to produce output — return a string for text, or a plain object/array for structured data. Example: return Schematic.ICs.map(c => c.Designator). See the tool description for the full Schematic reference and more examples.",
+          "type": "string"
+        },
+        "schematics": {
+          "items": {
+            "properties": {
+              "documentIds": {
+                "description": "Optional document IDs to restrict results to specific sheets. Use documentId values from a365_schematic_summary_details to target individual sheets. When null or empty, all sheets are returned.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "description": "Project GRID identifier (required).",
+                "type": "string"
+              },
+              "revisionIds": {
+                "description": "One or more commit-hash revision IDs to fetch. Null or empty means the latest revision. Each entry must be a non-empty string — null entries are rejected (use null/omit for the whole array if you want \"latest\"). The internal \"use latest\" sentinel produced by EffectiveRevisionIds is intentionally hidden from callers.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "variantName": {
+                "description": "Optional project variant name. When set, the schematic reflects that variant. The text tools exclude its Not Fitted components; the image tools draw them greyed and crossed instead, and a365_schematic_object_highlight reports the treatment per component in `variation`. Null or empty (the default) yields the base, un-varied design.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Selects which columns each result row carries (one row per schematic revision); omit for the default set. Allowed: projectId, revisionId, ok (compile + run succeeded), output (the script's return value, JSON-serialised), compileErrors (syntax/parse errors), runtimeError (uncaught exception message).",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schematics",
+        "code"
+      ],
+      "type": "object"
+    },
+    "name": "a365_schematic_script_run",
+    "title": "Execute JavaScript query against schematic model"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "title": "High-level schematic overview"
+    },
+    "description": "Returns a high-level overview: the sheet list, total component and net counts, a histogram of component types (how many ICs, resistors, capacitors, etc.), all power rail names, and the list of available custom property names.\nThis is the REQUIRED first step before a365_schematic_script_run: always call it for a project/revision before running any script. Its overview (sheet names, component property names, type histogram) is the context every script is written against, so never script a revision you have not summarised here first.\nFor a parts list — unique library components with their MPN, type, pin count, and placement designators — use a365_schematic_script_run to query Schematic.Library (the part definitions) joined to Schematic.Components (their placements); the property names in this overview tell you which custom parameters to read.\nCovers one or more schematic revisions and returns one row per revision; sheet entries expose both a friendly name and the stable documentId.\nNOTE: CategoriesHistogram uses heuristic type classification — treat counts as approximate; individual components may be misclassified. Trust Description, Value, and pin names over Type.",
+    "inputSchema": {
+      "properties": {
+        "schematics": {
+          "items": {
+            "properties": {
+              "documentIds": {
+                "description": "Optional document IDs to restrict results to specific sheets. Use documentId values from a365_schematic_summary_details to target individual sheets. When null or empty, all sheets are returned.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "description": "Project GRID identifier (required).",
+                "type": "string"
+              },
+              "revisionIds": {
+                "description": "One or more commit-hash revision IDs to fetch. Null or empty means the latest revision. Each entry must be a non-empty string — null entries are rejected (use null/omit for the whole array if you want \"latest\"). The internal \"use latest\" sentinel produced by EffectiveRevisionIds is intentionally hidden from callers.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "variantName": {
+                "description": "Optional project variant name. When set, the schematic reflects that variant. The text tools exclude its Not Fitted components; the image tools draw them greyed and crossed instead, and a365_schematic_object_highlight reports the treatment per component in `variation`. Null or empty (the default) yields the base, un-varied design.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "projectId"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "select": {
+          "default": null,
+          "properties": {
+            "fields": {
+              "description": "Array of field names to include. Allowed: projectId, revisionId, componentCount, netCount, sheets, powerRails, componentProperties, categoriesHistogram.",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schematics"
+      ],
+      "type": "object"
+    },
+    "name": "a365_schematic_summary_details",
+    "title": "High-level schematic overview"
+  }
+]

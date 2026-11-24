@@ -5,7 +5,8 @@ node_modules/
 docs/plans/
 
 # Local tooling / editor
-.claude/
+**/.claude/*
+!/.claude/skills
 .idea/
 .vscode/
 .DS_Store
