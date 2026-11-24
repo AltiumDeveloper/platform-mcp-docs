@@ -16,16 +16,18 @@ to make is in that diff. Otherwise you are working by hand, and the change is wh
 
 ## Source of truth
 
-- **In the sync workflow, the snapshot and nothing else.** Every claim on a tool page must follow from the tool's
-  `description`, `inputSchema` or `annotations`. Remove a claim the snapshot no longer supports. Never add one from
-  memory or from another product.
+- **In the sync workflow, the snapshot and nothing else.** Every claim you add or change must follow from the tool's
+  `description`, `inputSchema` or `annotations`; never add one from memory or from another product. Change existing
+  text only where the snapshot now contradicts it or the diff changed what it describes. A fact the snapshot does not
+  mention stays: it was written from the Platform MCP source by hand.
 - **By hand**, the Platform MCP source, as the Source of truth table in `content/README.md` describes.
 - **Two things the snapshot cannot see.** Its credential is bound to one workspace, so:
   - Tools in `tools/not-in-snapshot.json` are documented but absent from the snapshot: global-only tools, and tools
     documented ahead of their release. Leave their rows alone. When one appears in the snapshot, remove its entry
     and document it from the snapshot like any other tool. In the sync workflow, never add an entry; by hand, add
     one with a `reason` when you document a tool the snapshot cannot see.
-  - No schema has the `workspace_url` argument. Its absence is not a change; keep the pages' mentions of it.
+  - The snapshot leaves out the `workspace_url` argument, which production lists on some responses and not others.
+    Its absence is not a change; keep the pages' mentions of it.
 
 ## What you may change
 

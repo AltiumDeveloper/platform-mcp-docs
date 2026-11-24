@@ -88,7 +88,7 @@ export function parseClaudeReply({ status, stdout, stderr, error }) {
 
 // Up to ROUNDS rounds of author, path gate, checks and review. `steps` performs each; this decides what happens next.
 export function runRounds(steps) {
-  const result = { status: 'needs_human', rounds: 0, summary: '', failures: [], disputes: [], notes: [] };
+  const result = { status: 'needs_human', rounds: 0, summary: '', failures: [], disputes: [], notes: [], history: [] };
   let prompt = steps.firstPrompt;
   let outstanding = [];
   for (let round = 1; round <= ROUNDS; round++) {
@@ -122,6 +122,7 @@ export function runRounds(steps) {
       }
       const checks = steps.checks();
       if (checks.length) {
+        result.history.push({ round, failures: checks });
         outstanding = checks;
         result.failures = checks;
         result.notes = [];
@@ -141,6 +142,7 @@ export function runRounds(steps) {
         break;
       }
       outstanding = blocking.length ? blocking : ['The reviewer failed the change without naming a blocking problem.'];
+      result.history.push({ round, failures: outstanding });
       result.failures = outstanding;
       prompt = feedbackPrompt(round + 1, 'review', outstanding);
     } catch (error) {

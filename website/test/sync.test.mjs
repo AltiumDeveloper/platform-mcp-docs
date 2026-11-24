@@ -87,7 +87,7 @@ const fail = (issue) => ({ output: { verdict: 'fail', blocking: [{ file: 'conten
 
 test('runRounds: a first-round pass', () => {
   const steps = script({ authors: [done()], reviews: [pass] });
-  assert.deepEqual(runRounds(steps), { status: 'done', rounds: 1, summary: 'Updated a row.', failures: [], disputes: [], notes: ['Fine.'] });
+  assert.deepEqual(runRounds(steps), { status: 'done', rounds: 1, summary: 'Updated a row.', failures: [], disputes: [], notes: ['Fine.'], history: [] });
   assert.deepEqual(steps.calls.prompts, ['/update-tool-docs .tool-sync/tool-diff.md']);
 });
 
@@ -99,6 +99,7 @@ test('runRounds: review findings go back to the author, and a fix passes', () =>
   assert.match(steps.calls.prompts[1], /^Round 2 of 3\. The reviewer found these blocking problems\.[\s\S]*The cap is 60\./);
   assert.deepEqual(result.disputes, [{ failure: 'cap', action: 'disputed', reason: 'snapshot says 50' }]);
   assert.deepEqual(result.failures, []);
+  assert.deepEqual(result.history, [{ round: 1, failures: ['content/tools/design.md (Wrong or missing): The cap is 60.'] }]);
 });
 
 test('runRounds: failed checks go back to the author without a review, and three failures stop the run', () => {
@@ -204,4 +205,10 @@ test('runRounds: failed checks replace an earlier review finding as what is outs
   assert.deepEqual(result.failures, ['budget', 'npm test failed']);
   const unchanged = runRounds(script({ authors: [done(), { ...done(), changes: false }], checks: [['npm test failed']] }));
   assert.deepEqual(unchanged.failures, ['npm test failed', 'The author changed nothing in response to these.']);
+});
+
+test('normaliseTools drops workspace_url, which production lists inconsistently', async () => {
+  const { normaliseTools } = await import('../scripts/lib/tools.mjs');
+  const [tool] = normaliseTools([{ name: 'a365_x', inputSchema: { type: 'object', properties: { ids: {}, workspace_url: {} } } }]);
+  assert.deepEqual(Object.keys(tool.inputSchema.properties), ['ids']);
 });

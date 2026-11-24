@@ -12,8 +12,9 @@ const CHANGELOG_ROUTE = '/changelog/';
 export const SNAPSHOT = join(REPO_ROOT, 'tools/snapshot.json');
 export const NOT_IN_SNAPSHOT = join(REPO_ROOT, 'tools/not-in-snapshot.json');
 
-// The server adds this argument to every schema for its own bookkeeping; it says nothing about what a tool does.
-const PLUMBING_ARGS = new Set(['conversation_id']);
+// Arguments every schema carries that say nothing about one tool: the server's own bookkeeping, and the workspace URL,
+// which production lists for this credential on some responses and not others (tools/README.md).
+const PLUMBING_ARGS = new Set(['conversation_id', 'workspace_url']);
 const TOOL_FIELDS = ['name', 'title', 'description', 'inputSchema', 'annotations', '_meta'];
 
 const sortKeys = (value) => Array.isArray(value) ? value.map(sortKeys)

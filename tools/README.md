@@ -8,8 +8,9 @@ disagree.
   `A365_CLIENT_ID`, `A365_CLIENT_SECRET` and `A365_REFRESH_TOKEN`, a refresh token created in a workspace's
   **Admin → Developer** page.
 - **What it cannot see:** that token is bound to one workspace, so the list leaves out tools served only on global
-  connections and the `workspace_url` argument. Documented tools the list cannot see are listed, each with its reason,
-  in `not-in-snapshot.json`, so the check exempts them.
+  connections. Documented tools the list cannot see are listed, each with its reason, in `not-in-snapshot.json`, so the
+  check exempts them. The `workspace_url` argument is dropped from every schema, because production lists it for this
+  credential on some responses and not others.
 
 ## The tool sync workflow
 
@@ -17,8 +18,9 @@ disagree.
 the checks run and a second agent reviews the result, and failures go back to the author, for up to three rounds in
 all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync` into the branch it
 ran from. One that could not finish is labelled `needs-human` and asks the maintainers to review; one that passed asks
-no one. It never merges. GitHub starts no workflow for a pull request the workflow's own token opens, so the Docs checks do
-not run on it; the sync ran the same checks itself, and a person's push to the branch starts them.
+no one. It never merges. Its pull request shows a failed Docs check: GitHub holds a run for a pull request the
+workflow's own token opens, and it ends without running. The sync ran the same checks itself, and a person's push to
+the branch starts them for real. A run skips the agents when the open pull request already has the new snapshot.
 
 It needs:
 

@@ -21,8 +21,9 @@ You are reviewing the result, not a conversation: judge the pages as they now st
 
 A finding blocks only when it is one of these:
 
-- **Unsupported:** a claim on a tool page that the tool's `description`, `inputSchema` or `annotations` does not
-  support.
+- **Unsupported:** a claim the change adds or alters that the tool's `description`, `inputSchema` or `annotations`
+  does not support. Text the change leaves alone is out of scope unless the snapshot contradicts it: a fact the
+  snapshot does not mention was written from the Platform MCP source by hand.
 - **Wrong or missing:** a fact the snapshot states that a reader would act on, such as a limit, a default, what comes
   back or the Kind, that the page gets wrong or leaves out.
 - **A broken rule** in `update-tool-docs`, such as a file outside its scope, a missing changelog entry, or prose

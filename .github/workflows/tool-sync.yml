@@ -84,18 +84,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           open=$(gh pr list --head "$BRANCH" --state open --json number --jq length)
-          others=0
-          if [ "$open" != "0" ]; then
-            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.author.login != "github-actions[bot]")] | length')
-          fi
           echo "open=$open" >> "$GITHUB_OUTPUT"
-          if [ "$others" != "0" ]; then
-            gh pr comment "$BRANCH" --body "Production's tools changed again, but this branch has commits from a person, so the tool sync did not run. Merge or close this PR, then run the workflow again."
-            echo "$BRANCH has commits from a person; nothing run." >> "$GITHUB_STEP_SUMMARY"
-            echo "ours=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ours=true" >> "$GITHUB_OUTPUT"
+          ours=true
+          if [ "$open" != "0" ]; then
+            # The API gives bot commits no author login, so tell them apart by the commit email.
+            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.commit.author.email != "41898283+github-actions[bot]@users.noreply.github.com")] | length')
+            mkdir -p ../.tool-sync
+            gh api "repos/$GITHUB_REPOSITORY/contents/tools/snapshot.json?ref=$BRANCH" -H "Accept: application/vnd.github.raw" > ../.tool-sync/open-snapshot.json
+            if [ "$others" != "0" ]; then
+              gh pr comment "$BRANCH" --body "Production's tools changed, but this branch has commits from a person, so the tool sync did not run. Merge or close this PR, then run the workflow again."
+              echo "$BRANCH has commits from a person; nothing run." >> "$GITHUB_STEP_SUMMARY"
+              ours=false
+            elif cmp -s ../.tool-sync/open-snapshot.json ../tools/snapshot.json; then
+              echo "The open PR from $BRANCH already has this snapshot; nothing run." >> "$GITHUB_STEP_SUMMARY"
+              ours=false
+            fi
           fi
+          echo "ours=$ours" >> "$GITHUB_OUTPUT"
 
       - name: Describe the change
         if: steps.branch.outputs.ours == 'true'
@@ -113,6 +118,7 @@ jobs:
           # npm 12 skips install scripts unless allowed, and Claude Code installs its binary in one.
           npm install -g --allow-scripts=@anthropic-ai/claude-code "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
           node scripts/tool-sync.mjs ../.tool-sync/tool-diff.md
+          { echo '## Result'; echo '```json'; cat ../.tool-sync/tool-sync-result.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Open the pull request
         if: steps.branch.outputs.ours == 'true'
