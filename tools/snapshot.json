@@ -1188,7 +1188,7 @@
           ]
         },
         "includeCard": {
-          "default": false,
+          "default": true,
           "description": "ADVANCED — leave true. The interactive card is how the user views the highlighted components, and it no longer costs response payload (its images are fetched on demand). Set false only if the user wants the raw inline crop(s) with no viewer attached.",
           "type": "boolean"
         },

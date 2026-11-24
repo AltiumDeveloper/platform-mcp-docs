@@ -3,6 +3,10 @@
 What changed in the Altium 365 MCP Server, newest first. Altium updates the server for you, so there is nothing to
 install; the [Tool reference](./tools/index.md) always describes the current release.
 
+## 2026-11-24
+
+- **Changed** `a365_schematic_object_highlight`: highlighted images now come with the interactive card by default.
+
 ## First release
 
 The server at `https://mcp.altium.com`, with sign-in through your Altium account and these tools:
