@@ -728,7 +728,7 @@
       "readOnlyHint": true,
       "title": "List Projects"
     },
-    "description": "Returns a paginated list of design projects visible in the workspace. Supports filtering by name and date ranges, as well as column selection and pagination.\n**Use when:**\n- The user asks to list or discover projects in the Design bounded context.\n- Performing bulk listing, searching or discovery across projects.\n**Do NOT use when:**\n- Fetching full project metadata or payloads for a single project.\n- Performing write/update/delete operations on projects.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (50).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.",
+    "description": "Returns a paginated list of design projects visible in the workspace. Supports filtering by name and date ranges, as well as column selection and pagination.\n**Use when:**\n- The user asks to list or discover projects in the Design bounded context.\n- Performing bulk listing, searching or discovery across projects.\n**Do NOT use when:**\n- Fetching full project metadata or payloads for a single project.\n- Performing write/update/delete operations on projects.\n**Pagination:**\n- Omit page entirely to get the first page at the default pageSize (25).\n- When providing page, pageSize is required.\n- For subsequent pages, set page.cursor to the nextCursor from the previous response's pageInfo.",
     "inputSchema": {
       "properties": {
         "filter": {
