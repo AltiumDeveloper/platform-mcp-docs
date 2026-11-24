@@ -37,6 +37,7 @@ website/
   test/site.test.mjs                 Pinned URLs, icons, Dev Center URLs, Markdown helpers, search, checks
 CHANGELOG.md                         Published as /changelog/: what changed in each release, newest first
 OPEN-ISSUES.md                       Unknowns and things to confirm. Never put them in page text.
+docs/plans/                          Working plans, Markdown or HTML. Gitignored: never commit a plan.
 ```
 
 ## Rules for `devcenter/`

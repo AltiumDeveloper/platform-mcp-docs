@@ -1,6 +1,9 @@
 # Node
 node_modules/
 
+# Working plans, never committed
+docs/plans/
+
 # Local tooling / editor
 .claude/
 .idea/
