@@ -150,6 +150,19 @@ export function runRounds(steps) {
       break;
     }
   }
+  // A run that stopped before the gate may still hold rejected work, such as a page started for a new area.
+  if (result.status !== 'done' && !result.breach && result.rounds > 0) {
+    try {
+      const breaches = steps.breaches();
+      if (breaches.length) {
+        result.breach = true;
+        result.failures.push(...breaches);
+      }
+    } catch (error) {
+      result.breach = true;
+      result.failures.push(`The path gate failed: ${error.message}`);
+    }
+  }
   return result;
 }
 

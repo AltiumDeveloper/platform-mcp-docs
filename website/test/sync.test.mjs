@@ -212,3 +212,18 @@ test('normaliseTools drops workspace_url, which production lists inconsistently'
   const [tool] = normaliseTools([{ name: 'a365_x', inputSchema: { type: 'object', properties: { ids: {}, workspace_url: {} } } }]);
   assert.deepEqual(Object.keys(tool.inputSchema.properties), ['ids']);
 });
+
+test('runRounds: a run that stops before the gate still has its work checked', () => {
+  const page = ['content/tools/bom.md is a new file'];
+  const stoppedAuthor = runRounds({ ...script({ authors: [{ output: { status: 'needs_human', summary: 'A new area.', responses: [] } }] }), breaches: () => page });
+  assert.deepEqual([stoppedAuthor.breach, stoppedAuthor.failures], [true, ['The author stopped: A new area.', ...page]]);
+  const errored = runRounds({ ...script({ authors: [{ error: 'claude stopped with error_max_budget_usd' }] }), breaches: () => page });
+  assert.equal(errored.breach, true);
+  const clean = runRounds(script({ authors: [{ output: { status: 'needs_human', summary: 'Unsure.', responses: [] } }] }));
+  assert.equal(clean.breach, undefined);
+  const broken = runRounds({ ...script({ authors: [{ error: 'x' }] }), breaches: () => { throw new Error('bad JSON'); } });
+  assert.deepEqual([broken.breach, broken.failures.at(-1)], [true, 'The path gate failed: bad JSON']);
+  let gateCalls = 0;
+  runRounds({ ...script({ authors: [done()], reviews: [pass] }), breaches: () => { gateCalls++; return []; } });
+  assert.equal(gateCalls, 1);
+});
