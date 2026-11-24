@@ -1,0 +1,10 @@
+[
+  {
+    "name": "a365_platform_workspace_list",
+    "reason": "Served on global connections only; the snapshot credential is workspace-scoped."
+  },
+  {
+    "name": "a365_schematic_variantdiff_details",
+    "reason": "Documented ahead of its production release."
+  }
+]

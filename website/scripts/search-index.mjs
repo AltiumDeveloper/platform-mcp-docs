@@ -22,7 +22,7 @@ const { allPages } = require('../pages.cjs');
 export const TOOL_GROUPS = allPages().filter((page) => page.kind === 'tool' && page.icon)
   .map((page) => ({ route: page.route, title: page.label, slug: page.icon }));
 
-const TOOL_NAME = /`(a365_[a-z_]+\*?)`/g;
+export const TOOL_NAME = /`(a365_[a-z0-9_]+\*?)`/g;
 
 // The tools of a page's tables: every backticked tool name in a row's first cell, with the row's other cells as text,
 // and the anchor of the `##` section the table is in (null before the first heading).
@@ -36,7 +36,7 @@ export function toolRows(source) {
       if (cells.length < 2) continue;
       const names = [...cells[0].matchAll(TOOL_NAME)].map((m) => m[1]);
       const text = stripMarkdown(cells.slice(1).join(' '));
-      for (const name of names) rows.push({ name, text, anchor });
+      for (const name of names) rows.push({ name, text, anchor, cells: cells.slice(1) });
     }
   }
   return rows;

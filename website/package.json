@@ -18,7 +18,9 @@
     "llms": "node scripts/llms.mjs",
     "llms:check": "node scripts/llms-check.mjs",
     "test": "node --test \"test/**/*.test.mjs\"",
-    "devcenter:check": "node scripts/devcenter-check.mjs"
+    "devcenter:check": "node scripts/devcenter-check.mjs",
+    "tools:snapshot": "node scripts/tool-snapshot.mjs",
+    "tools:check": "node scripts/tools-check.mjs"
   },
   "browserslist": {
     "production": [

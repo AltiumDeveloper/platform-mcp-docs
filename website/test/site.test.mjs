@@ -7,6 +7,7 @@ import test from 'node:test';
 import { contentProblems, devcenterPages, linkProblem } from '../scripts/devcenter-check.mjs';
 import { absoluteLinks, pageSections, pageTitle, readPages } from '../scripts/lib/markdown.mjs';
 import { buildIndex } from '../scripts/search-index.mjs';
+import { NOT_IN_SNAPSHOT, SNAPSHOT, readJson } from '../scripts/lib/tools.mjs';
 import { loadIndex, search } from '../src/search/engine.mjs';
 
 const require = createRequire(import.meta.url);
@@ -28,7 +29,7 @@ test('every published page keeps its URL', () => {
 test('every page icon has its rule', () => {
   const css = readFileSync(new URL('../src/css/custom.css', import.meta.url), 'utf8');
   const icons = allPages().map((page) => page.icon).filter(Boolean);
-  const cards = [...readFileSync(new URL('../../docs/index.mdx', import.meta.url), 'utf8').matchAll(/bc-icon bc-([a-z]+)/g)].map((m) => m[1]);
+  const cards = [...readFileSync(new URL('../../content/index.mdx', import.meta.url), 'utf8').matchAll(/bc-icon bc-([a-z]+)/g)].map((m) => m[1]);
   assert.ok(icons.length > 0 && cards.length > 0);
   for (const icon of new Set([...icons, ...cards])) {
     const rule = new RegExp(`\\.bc-${icon} \\{([^}]*)\\}`).exec(css)?.[1];
@@ -117,14 +118,16 @@ test('devcenter check: links into the site must resolve, with their anchors', ()
   assert.match(linkProblem(`${siteUrl}/tools`, options), /trailing-slash/);
   assert.match(linkProblem(`${siteUrl}/missing/`, options), /no page/);
   assert.equal(linkProblem('https://claude.ai/download', options), null);
-  assert.match(linkProblem('../docs/setup.md', options), /absolute URL/);
+  assert.match(linkProblem('../content/setup.md', options), /absolute URL/);
 });
 
 test('search: every tool-page record has its tool group, and the filter keeps only that group', async () => {
   const payload = await buildIndex();
   assert.deepEqual(payload.groups.map((g) => g.title), allPages().filter((p) => p.kind === 'tool' && p.icon).map((p) => p.label));
   const tools = payload.records.filter((r) => r.x);
-  assert.ok(tools.length >= 21 && tools.every((r) => payload.groups[r.c]), 'every tool name record has a group');
+  const documented = [...readJson(SNAPSHOT), ...readJson(NOT_IN_SNAPSHOT)].map((tool) => tool.name);
+  assert.deepEqual(documented.filter((name) => !tools.some((r) => r.n === name)), [], 'every documented tool has a search record');
+  assert.ok(tools.every((r) => payload.groups[r.c]), 'every tool name record has a group');
   const { records, synonyms, index } = loadIndex(payload);
   const comments = payload.groups.findIndex((g) => g.slug === 'comments');
   const hits = search(index, records, 'delete', { synonyms, toolGroup: comments });

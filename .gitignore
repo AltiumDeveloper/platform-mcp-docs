@@ -1,8 +1,15 @@
 # Node
 node_modules/
 
+# Working plans, never committed
+docs/plans/
+
+# The tool sync workflow's working files (website/scripts/tool-sync.mjs)
+.tool-sync/
+
 # Local tooling / editor
-.claude/
+**/.claude/*
+!/.claude/skills
 .idea/
 .vscode/
 .DS_Store
