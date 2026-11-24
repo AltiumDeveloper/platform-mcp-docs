@@ -14,13 +14,13 @@ disagree.
 
 ## The tool sync workflow
 
-`.github/workflows/tool-sync.yml`, run by hand, refreshes the list. When it changed, an agent updates the tool pages,
-the checks run and a second agent reviews the result, and failures go back to the author, for up to three rounds in
-all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync` into the branch it
-ran from. One that could not finish is labelled `needs-human` and asks the maintainers to review; one that passed asks
-no one. It never merges. Its pull request shows a failed Docs check: GitHub holds a run for a pull request the
-workflow's own token opens, and it ends without running. The sync ran the same checks itself, and a person's push to
-the branch starts them for real. A run skips the agents when the open pull request already has the new snapshot.
+`.github/workflows/tool-sync.yml`, run daily at 04:00 UTC or by hand, refreshes the list. When it changed, an agent
+updates the tool pages, the checks run and a second agent reviews the result, and failures go back to the author, for up
+to three rounds in all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync`
+into the branch it ran from. One that could not finish is labelled `needs-human` and asks the maintainers to review; one
+that passed asks no one. It never merges. Its pull request shows a failed Docs check: GitHub holds a run for a pull
+request the workflow's own token opens, and it ends without running. The sync ran the same checks itself, and a person's
+push to the branch starts them for real. A run skips the agents when the open pull request already has the new snapshot.
 
 It needs:
 

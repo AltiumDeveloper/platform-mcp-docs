@@ -4,6 +4,9 @@ name: Tool sync
 # Setup (secrets, variable, repo setting) is in tools/README.md.
 on:
   workflow_dispatch:
+  # Every day at 04:00 UTC. GitHub runs schedules only from the default branch.
+  schedule:
+    - cron: "0 4 * * *"
 
 permissions:
   contents: read
@@ -87,17 +90,24 @@ jobs:
           echo "open=$open" >> "$GITHUB_OUTPUT"
           ours=true
           if [ "$open" != "0" ]; then
-            # The API gives bot commits no author login, so tell them apart by the commit email.
-            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.commit.author.email != "41898283+github-actions[bot]@users.noreply.github.com")] | length')
             mkdir -p ../.tool-sync
             gh api "repos/$GITHUB_REPOSITORY/contents/tools/snapshot.json?ref=$BRANCH" -H "Accept: application/vnd.github.raw" > ../.tool-sync/open-snapshot.json
-            if [ "$others" != "0" ]; then
-              gh pr comment "$BRANCH" --body "Production's tools changed, but this branch has commits from a person, so the tool sync did not run. Merge or close this PR, then run the workflow again."
-              echo "$BRANCH has commits from a person; nothing run." >> "$GITHUB_STEP_SUMMARY"
+            # The API gives bot commits no author login, so tell them apart by the commit email.
+            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.commit.author.email != "41898283+github-actions[bot]@users.noreply.github.com")] | length')
+            if cmp -s ../.tool-sync/open-snapshot.json ../tools/snapshot.json; then
+              note="The open PR from $BRANCH already has this snapshot; nothing run."
               ours=false
-            elif cmp -s ../.tool-sync/open-snapshot.json ../tools/snapshot.json; then
-              echo "The open PR from $BRANCH already has this snapshot; nothing run." >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$others" != "0" ]; then
+              note="Production's tools changed again, but $BRANCH has commits from a person, so the tool sync did not run. Merge or close the PR, then run the workflow again."
               ours=false
+              # One comment per PR is enough; later runs only record it in their summary.
+              if [ "$(gh pr view "$BRANCH" --json comments --jq '[.comments[] | select(.body | startsWith("Production'"'"'s tools changed again"))] | length')" = "0" ]; then
+                gh pr comment "$BRANCH" --body "$note"
+              fi
+            fi
+            if [ "$ours" = "false" ]; then
+              echo "$note"
+              echo "$note" >> "$GITHUB_STEP_SUMMARY"
             fi
           fi
           echo "ours=$ours" >> "$GITHUB_OUTPUT"
