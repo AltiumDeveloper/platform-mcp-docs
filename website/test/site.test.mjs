@@ -7,6 +7,7 @@ import test from 'node:test';
 import { contentProblems, devcenterPages, linkProblem } from '../scripts/devcenter-check.mjs';
 import { absoluteLinks, pageSections, pageTitle, readPages } from '../scripts/lib/markdown.mjs';
 import { buildIndex } from '../scripts/search-index.mjs';
+import { NOT_IN_SNAPSHOT, SNAPSHOT, readJson } from '../scripts/lib/tools.mjs';
 import { loadIndex, search } from '../src/search/engine.mjs';
 
 const require = createRequire(import.meta.url);
@@ -124,7 +125,9 @@ test('search: every tool-page record has its tool group, and the filter keeps on
   const payload = await buildIndex();
   assert.deepEqual(payload.groups.map((g) => g.title), allPages().filter((p) => p.kind === 'tool' && p.icon).map((p) => p.label));
   const tools = payload.records.filter((r) => r.x);
-  assert.ok(tools.length >= 21 && tools.every((r) => payload.groups[r.c]), 'every tool name record has a group');
+  const documented = [...readJson(SNAPSHOT), ...readJson(NOT_IN_SNAPSHOT)].map((tool) => tool.name);
+  assert.deepEqual(documented.filter((name) => !tools.some((r) => r.n === name)), [], 'every documented tool has a search record');
+  assert.ok(tools.every((r) => payload.groups[r.c]), 'every tool name record has a group');
   const { records, synonyms, index } = loadIndex(payload);
   const comments = payload.groups.findIndex((g) => g.slug === 'comments');
   const hits = search(index, records, 'delete', { synonyms, toolGroup: comments });

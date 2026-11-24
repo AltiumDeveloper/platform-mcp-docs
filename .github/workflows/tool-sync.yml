@@ -1,14 +1,147 @@
 name: Tool sync
 
-# Placeholder so the workflow can be dispatched from a branch; the real workflow arrives with AFS-72626.
+# Updates the tool pages when production's tools change, through agents and checks, and opens a PR; never merges.
+# Setup (secrets, variable, repo setting) is in tools/README.md.
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: tool-sync
+  cancel-in-progress: false
+
+env:
+  BRANCH: bot/tool-sync
+  REVIEWERS: a-penning,artjom-orekhov-altium,dbloodworth-altium,kolomiets-altium
+  CLAUDE_CODE_VERSION: 2.1.331
+
+defaults:
+  run:
+    working-directory: website
+
 jobs:
   sync:
+    # A run from another branch would carry that branch's commits into the PR to main.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Three rounds of two claude runs of up to 20 minutes each, plus the checks.
+    timeout-minutes: 150
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
-      - run: echo "The tool sync workflow is not on this branch yet."
+      # No stored credential, so the agents cannot read the push token from .git/config.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm install -g npm@12
+      - run: npm ci
+
+      - name: Warn before the refresh token expires
+        if: vars.A365_REFRESH_TOKEN_EXPIRES != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPIRES: ${{ vars.A365_REFRESH_TOKEN_EXPIRES }}
+        run: |
+          if ! expires=$(date -d "$EXPIRES" +%s 2>/dev/null); then
+            echo "::warning::A365_REFRESH_TOKEN_EXPIRES is not a date: $EXPIRES"
+            exit 0
+          fi
+          days=$(( (expires - $(date -d "$(date +%F)" +%s)) / 86400 ))
+          title="Tool sync: the A365 refresh token expires on $EXPIRES"
+          if [ "$days" -le 30 ] && [ -z "$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[].number')" ]; then
+            gh issue create --title "$title" --body "Create a new refresh token in the workspace's Admin > Developer page, then update the A365_REFRESH_TOKEN secret and the A365_REFRESH_TOKEN_EXPIRES variable. After the expiry, the tool sync workflow cannot read production's tools."
+          fi
+
+      - name: Snapshot production's tools
+        id: snapshot
+        env:
+          A365_CLIENT_ID: ${{ secrets.A365_CLIENT_ID }}
+          A365_CLIENT_SECRET: ${{ secrets.A365_CLIENT_SECRET }}
+          A365_REFRESH_TOKEN: ${{ secrets.A365_REFRESH_TOKEN }}
+        run: |
+          npm run tools:snapshot
+          git add ../tools/snapshot.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Production's tools are unchanged." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A person may be finishing an open PR from an earlier run: never push over their commits, or pay for agents first.
+      - name: Check the branch is the bot's
+        id: branch
+        if: steps.snapshot.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh pr list --head "$BRANCH" --state open --json number --jq length)
+          others=0
+          if [ "$open" != "0" ]; then
+            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/main...$BRANCH" --jq '[.commits[] | select(.author.login != "github-actions[bot]")] | length')
+          fi
+          echo "open=$open" >> "$GITHUB_OUTPUT"
+          if [ "$others" != "0" ]; then
+            gh pr comment "$BRANCH" --body "Production's tools changed again, but this branch has commits from a person, so the tool sync did not run. Merge or close this PR, then run the workflow again."
+            echo "$BRANCH has commits from a person; nothing run." >> "$GITHUB_STEP_SUMMARY"
+            echo "ours=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ours=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Describe the change
+        if: steps.branch.outputs.ours == 'true'
+        run: |
+          mkdir -p ../.tool-sync
+          git show HEAD:tools/snapshot.json > ../.tool-sync/snapshot-before.json
+          node scripts/tool-diff.mjs ../.tool-sync/snapshot-before.json ../tools/snapshot.json > ../.tool-sync/tool-diff.md
+          cat ../.tool-sync/tool-diff.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update and review the tool pages
+        if: steps.branch.outputs.ours == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # npm 12 skips install scripts unless allowed, and Claude Code installs its binary in one.
+          npm install -g --allow-scripts=@anthropic-ai/claude-code "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
+          node scripts/tool-sync.mjs ../.tool-sync/tool-diff.md
+
+      - name: Open the pull request
+        if: steps.branch.outputs.ours == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=$(node -p "require('../.tool-sync/tool-sync-result.json').status")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          remote="https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git checkout -B "$BRANCH"
+          # Work the path gate rejected stays out of the PR; the snapshot stays as staged from production.
+          if [ "$(node -p "require('../.tool-sync/tool-sync-result.json').breach === true")" = "true" ]; then
+            git restore --worktree -- ../content ../tools
+            git clean -fdq -- ../content ../tools
+          fi
+          git add ../tools/not-in-snapshot.json ../content/tools ../content/changelog.md
+          git commit -m "Update the tool reference from production's tools"
+          git push --force "$remote" "$BRANCH"
+          if [ "${{ steps.branch.outputs.open }}" != "0" ]; then
+            gh pr edit "$BRANCH" --body-file ../.tool-sync/tool-sync-pr.md
+          else
+            gh pr create --base main --head "$BRANCH" --title "Update the tool reference from production's tools" --body-file ../.tool-sync/tool-sync-pr.md
+          fi
+          if [ "$status" = "done" ]; then
+            gh pr edit "$BRANCH" --remove-label needs-human || true
+          else
+            gh label create needs-human --color D93F0B --description "The tool sync could not finish on its own" --force
+            gh pr edit "$BRANCH" --add-label needs-human --add-reviewer "$REVIEWERS"
+          fi

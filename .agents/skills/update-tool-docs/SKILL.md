@@ -10,9 +10,9 @@ description: |-
 
 # Update the tool reference
 
-The tool pages document what production serves. `tools/snapshot.json` is production's `tools/list`. The sync workflow
-(`.github/workflows/tool-sync.yml`) is not built yet; until it is, follow the By hand rules. In the sync workflow, the
-change to make is in the diff named in your arguments. By hand, it is whatever you were asked to document.
+The tool pages document what production serves. `tools/snapshot.json` is production's `tools/list`. You are in the
+sync workflow, `.github/workflows/tool-sync.yml`, when your arguments name a tool diff under `.tool-sync/`; the change
+to make is in that diff. Otherwise you are working by hand, and the change is whatever you were asked to document.
 
 ## Source of truth
 
@@ -93,8 +93,8 @@ Follow the Writing section of `content/README.md`; `tools-check` enforces the ru
 ## Responding to failures
 
 In the sync workflow, from round 2 you get the failing checks or the reviewer's blocking findings. For each, either
-fix it or dispute it with a reason that cites the snapshot or a rule above. A disputed finding is listed for the human
-reviewers; do not dispute to avoid work.
+fix it or dispute it with a reason that cites the snapshot or a rule above. A disputed finding is listed in the pull
+request for whoever merges it; do not dispute to avoid work.
 
 ## Before you finish
 

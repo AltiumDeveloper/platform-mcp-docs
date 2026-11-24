@@ -10,7 +10,7 @@ import { FENCE, readPages } from './markdown.mjs';
 const { REPO_ROOT, allPages } = createRequire(import.meta.url)('../../pages.cjs');
 const CHANGELOG_ROUTE = '/changelog/';
 export const SNAPSHOT = join(REPO_ROOT, 'tools/snapshot.json');
-const NOT_IN_SNAPSHOT = join(REPO_ROOT, 'tools/not-in-snapshot.json');
+export const NOT_IN_SNAPSHOT = join(REPO_ROOT, 'tools/not-in-snapshot.json');
 
 // The server adds this argument to every schema for its own bookkeeping; it says nothing about what a tool does.
 const PLUMBING_ARGS = new Set(['conversation_id']);
