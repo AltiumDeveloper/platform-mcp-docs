@@ -13,11 +13,11 @@ disagree.
 
 ## The tool sync workflow
 
-`.github/workflows/tool-sync.yml`, run by hand from `main`, refreshes the list. When it changed, an agent updates
-the tool pages, the checks run and a second agent reviews the result, and failures go back to the author, for up to
-three rounds in all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync`.
-One that could not finish is labelled `needs-human` and asks the maintainers to review; one that passed asks no one.
-It never merges. GitHub starts no workflow for a pull request the workflow's own token opens, so the Docs checks do
+`.github/workflows/tool-sync.yml`, run by hand, refreshes the list. When it changed, an agent updates the tool pages,
+the checks run and a second agent reviews the result, and failures go back to the author, for up to three rounds in
+all (`ROUNDS` in `website/scripts/lib/sync.mjs`). It then opens a pull request from `bot/tool-sync` into the branch it
+ran from. One that could not finish is labelled `needs-human` and asks the maintainers to review; one that passed asks
+no one. It never merges. GitHub starts no workflow for a pull request the workflow's own token opens, so the Docs checks do
 not run on it; the sync ran the same checks itself, and a person's push to the branch starts them.
 
 It needs:
@@ -27,6 +27,6 @@ It needs:
   opens an issue to replace the token, unless one is already open.
 - **Repository setting:** Actions, General, "Allow GitHub Actions to create and approve pull requests".
 
-For a dry run without the API, set `CLAUDE_BIN` to a stand-in for `claude` and `TOOL_SYNC_BASE` to a local ref, then
-run `node scripts/tool-sync.mjs ../.tool-sync/tool-diff.md` in `website/` with the new snapshot staged. The diff must
-be in the gitignored `.tool-sync/`, or the path gate counts it as a new file.
+For a dry run without the API, set `CLAUDE_BIN` to a stand-in for `claude`, then run
+`node scripts/tool-sync.mjs ../.tool-sync/tool-diff.md` in `website/` with the new snapshot staged. The diff must be in
+the gitignored `.tool-sync/`, or the path gate counts it as a new file.

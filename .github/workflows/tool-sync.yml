@@ -23,8 +23,6 @@ defaults:
 
 jobs:
   sync:
-    # A run from another branch would carry that branch's commits into the PR to main.
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     # Three rounds of two claude runs of up to 20 minutes each, plus the checks.
     timeout-minutes: 150
@@ -88,7 +86,7 @@ jobs:
           open=$(gh pr list --head "$BRANCH" --state open --json number --jq length)
           others=0
           if [ "$open" != "0" ]; then
-            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/main...$BRANCH" --jq '[.commits[] | select(.author.login != "github-actions[bot]")] | length')
+            others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.author.login != "github-actions[bot]")] | length')
           fi
           echo "open=$open" >> "$GITHUB_OUTPUT"
           if [ "$others" != "0" ]; then
@@ -137,7 +135,8 @@ jobs:
           if [ "${{ steps.branch.outputs.open }}" != "0" ]; then
             gh pr edit "$BRANCH" --body-file ../.tool-sync/tool-sync-pr.md
           else
-            gh pr create --base main --head "$BRANCH" --title "Update the tool reference from production's tools" --body-file ../.tool-sync/tool-sync-pr.md
+            # The PR targets the branch the run started from, so it carries only this run's commit.
+            gh pr create --base "$GITHUB_REF_NAME" --head "$BRANCH" --title "Update the tool reference from production's tools" --body-file ../.tool-sync/tool-sync-pr.md
           fi
           if [ "$status" = "done" ]; then
             gh pr edit "$BRANCH" --remove-label needs-human || true

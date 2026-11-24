@@ -15,9 +15,8 @@ import { NOT_IN_SNAPSHOT, readJson } from './lib/tools.mjs';
 const { REPO_ROOT } = createRequire(import.meta.url)('../pages.cjs');
 const MODEL = 'claude-opus-5-5';
 const BUDGET = { author: '5', review: '2' };
-// Dry runs (tools/README.md) swap in a stand-in for claude and a local base ref.
+// Dry runs (tools/README.md) swap in a stand-in for claude.
 const CLAUDE = process.env.CLAUDE_BIN ?? 'claude';
-const BASE = process.env.TOOL_SYNC_BASE ?? 'origin/main';
 
 const git = (...args) => execFileSync('git', args, { cwd: REPO_ROOT, encoding: 'utf8' });
 const lines = (text) => text.split('\n').filter(Boolean);
@@ -52,7 +51,8 @@ function checks() {
   for (const [name, command, args] of [
     ['npm test', 'npm', ['test']],
     ['npm run build', 'npm', ['run', 'build']],
-    ['tools-check --base', 'node', ['scripts/tools-check.mjs', '--base', BASE]],
+    // HEAD is the commit the run started from: its snapshot and changelog are the ones this change replaces.
+    ['tools-check --base', 'node', ['scripts/tools-check.mjs', '--base', 'HEAD']],
   ]) {
     const run = spawnSync(command, args, { cwd: join(REPO_ROOT, 'website'), encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024, timeout: CHECK_TIMEOUT_MS });
     // Passing test lines say nothing about the failure.
