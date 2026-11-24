@@ -1,0 +1,14 @@
+name: Tool sync
+
+# Placeholder so the workflow can be dispatched from a branch; the real workflow arrives with AFS-72626.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The tool sync workflow is not on this branch yet."
