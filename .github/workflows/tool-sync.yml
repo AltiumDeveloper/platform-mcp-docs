@@ -77,12 +77,24 @@ jobs:
           A365_CLIENT_ID: ${{ secrets.A365_CLIENT_ID }}
           A365_CLIENT_SECRET: ${{ secrets.A365_CLIENT_SECRET }}
           A365_REFRESH_TOKEN: ${{ secrets.A365_REFRESH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           npm run tools:snapshot
           git add ../tools/snapshot.json
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Production's tools are unchanged." >> "$GITHUB_STEP_SUMMARY"
+            # Production matching the branch again (a rollback, say) leaves an open bot PR describing tools no longer served.
+            if [ "$(gh pr list --head "$BRANCH" --state open --json number --jq length)" != "0" ]; then
+              others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.commit.author.email != "41898283+github-actions[bot]@users.noreply.github.com")] | length')
+              note="Production's tools match $GITHUB_REF_NAME again, so this PR's changes are no longer served."
+              if [ "$others" = "0" ]; then
+                gh pr close "$BRANCH" --delete-branch --comment "$note"
+              elif [ "$(gh pr view "$BRANCH" --json comments --jq '[.comments[] | select(.body | startsWith("Production'"'"'s tools match"))] | length')" = "0" ]; then
+                gh pr comment "$BRANCH" --body "$note Close it unless the person's commits on it are still wanted."
+              fi
+              echo "$note" | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi

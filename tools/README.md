@@ -22,7 +22,8 @@ set, and a merge into the default branch starts the Docs deploy. One that could 
 labelled `needs-human` and asks the maintainers to review. Its pull request shows a failed Docs check: GitHub holds a
 run for a pull request the workflow's own token opens, and it ends without running. The sync ran the same checks itself,
 and a person's push to the branch starts them for real. A run skips the agents when the open pull request already has
-the new snapshot.
+the new snapshot. A run that finds production matching the branch again closes an open bot pull request, or comments on
+it once if a person has committed to it.
 
 It needs:
 
