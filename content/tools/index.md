@@ -54,4 +54,3 @@ Tools are grouped by the area their name names, `a365_<area>_…`:
 - [Platform](./platform.md): workspaces
 - [Design](./design.md): projects, variants and project history
 - [Schematic](./schematic.md): schematic data, images and comparisons
-- [Collaboration](./collaboration.md): comment threads and replies

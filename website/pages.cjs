@@ -62,7 +62,6 @@ const SECTIONS = [
       { file: 'content/tools/platform.md', route: '/tools/platform/', label: 'Platform', icon: 'workspace', description: 'The Altium 365 workspaces you can reach, and targeting one of them.' },
       { file: 'content/tools/design.md', route: '/tools/design/', label: 'Design', icon: 'design', description: 'Projects, their details, revisions and variants, and their history.' },
       { file: 'content/tools/schematic.md', route: '/tools/schematic/', label: 'Schematic', icon: 'schematic', description: 'Schematic data and the query tool, sheet images and highlighting, and comparing revisions and variants.' },
-      { file: 'content/tools/collaboration.md', route: '/tools/collaboration/', label: 'Collaboration', icon: 'comments', description: 'Altium 365 comment threads and replies on schematic components and nets.' },
     ],
   },
   {
