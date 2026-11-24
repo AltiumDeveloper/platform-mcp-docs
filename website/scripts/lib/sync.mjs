@@ -91,6 +91,7 @@ export function runRounds(steps) {
   const result = { status: 'needs_human', rounds: 0, summary: '', failures: [], disputes: [], notes: [], history: [] };
   let prompt = steps.firstPrompt;
   let outstanding = [];
+  let gatedRound = 0;
   for (let round = 1; round <= ROUNDS; round++) {
     result.rounds = round;
     try {
@@ -114,6 +115,7 @@ export function runRounds(steps) {
         result.failures = [...outstanding, allDisputed ? 'The author disputed these without changing anything.' : 'The author changed nothing in response to these.'];
         break;
       }
+      gatedRound = round;
       const breaches = steps.breaches();
       if (breaches.length) {
         result.failures = [...breaches, ...outstanding];
@@ -151,7 +153,7 @@ export function runRounds(steps) {
     }
   }
   // A run that stopped before the gate may still hold rejected work, such as a page started for a new area.
-  if (result.status !== 'done' && !result.breach && result.rounds > 0) {
+  if (result.status !== 'done' && !result.breach && result.rounds > 0 && gatedRound !== result.rounds) {
     try {
       const breaches = steps.breaches();
       if (breaches.length) {

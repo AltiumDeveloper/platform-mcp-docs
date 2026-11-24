@@ -226,4 +226,7 @@ test('runRounds: a run that stops before the gate still has its work checked', (
   let gateCalls = 0;
   runRounds({ ...script({ authors: [done()], reviews: [pass] }), breaches: () => { gateCalls++; return []; } });
   assert.equal(gateCalls, 1);
+  gateCalls = 0;
+  runRounds({ ...script({ authors: [done(), done(), done()], checks: [['x'], ['x'], ['x']] }), breaches: () => { gateCalls++; return []; } });
+  assert.equal(gateCalls, 3);
 });
