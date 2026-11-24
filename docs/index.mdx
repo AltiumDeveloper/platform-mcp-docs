@@ -1,0 +1,46 @@
+# Altium 365 MCP Server
+
+The **Altium 365 MCP Server** lets an AI assistant, such as Claude, read and act on the projects in your Altium 365
+workspace. It runs in Altium's cloud, so there is nothing to install: you add one URL to your AI client and sign in
+with your Altium account.
+
+Without it, an AI chat knows nothing about your designs. With it, you can ask:
+
+> *"Which projects in my workspace changed this week, and what changed in each?"*
+>
+> *"What is connected to the RESET net on the main board? Show me where it is on the schematic."*
+>
+> *"List the open comment threads on the main board and suggest a reply to each."*
+
+and the assistant answers from the design data stored in your workspace.
+
+**MCP** stands for *Model Context Protocol*, an open standard for connecting applications to AI assistants. You do not
+need to understand the protocol to use the server.
+
+<div className="hero-actions">
+
+[Getting started](./setup.md)
+[Try it now](./sample-prompts.md)
+[Tool reference](./tools/index.md)
+
+</div>
+
+## What you can do with it
+
+<div className="bc-grid">
+
+[<i className="bc-icon bc-workspace"></i><strong>Platform</strong> <span>List the Altium 365 workspaces you belong to and point a question at any one of them.</span>](./tools/platform.md)
+
+[<i className="bc-icon bc-design"></i><strong>Design</strong> <span>Find projects, read their details, documents, parameters, latest release, revisions and variants, and their history: who committed, released or copied what and when.</span>](./tools/design.md)
+
+[<i className="bc-icon bc-schematic"></i><strong>Schematic</strong> <span>Query the compiled design of any committed revision, render sheets and highlight components or nets on them, and compare revisions and variants field by field.</span>](./tools/schematic.md)
+
+[<i className="bc-icon bc-comments"></i><strong>Collaboration</strong> <span>Create, read, reply to, edit, resolve and delete comments on schematic components and nets, the same comments your team sees in Altium 365.</span>](./tools/collaboration.md)
+
+</div>
+
+## For AI assistants
+
+Every page is also available as Markdown (add `.md` to its URL, or use **View as Markdown**).
+[`llms.txt`](pathname:///llms.txt) indexes the site, and [`llms-full.txt`](pathname:///llms-full.txt) has every page
+in one file.

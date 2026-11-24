@@ -1,0 +1,9 @@
+# Node
+node_modules/
+
+# Local tooling / editor
+.claude/
+.idea/
+.vscode/
+.DS_Store
+*.log

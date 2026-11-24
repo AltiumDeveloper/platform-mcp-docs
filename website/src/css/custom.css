@@ -1,0 +1,58 @@
+/**
+ * This site's own CSS, loaded after the shared theme (@altium-developer/docusaurus-theme): the icons of the tool
+ * groups, on the home page cards (docs/index.mdx) and before the tool pages in the sidebar (website/pages.cjs `icon`).
+ */
+
+/* Platform: a cloud. */
+.bc-workspace {
+  --bc-bg: #c9daf8;
+  --bc-img: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0d11%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018a4.5%204.5%200%200%201-.6-8.96A6%206%200%200%201%2018%209.5a4%204%200%200%201-.5%208.5H7z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* Design: stacked layers. */
+.bc-design {
+  --bc-bg: #cfd8e3;
+  --bc-img: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0d11%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203%203%208l9%205%209-5-9-5z%22%2F%3E%3Cpath%20d%3D%22m3%2013%209%205%209-5%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* Schematic data: a resistor between two nodes. */
+.bc-schematic {
+  --bc-bg: #a2c4c9;
+  --bc-img: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0d11%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%2012h4l2-4%203%208%203-8%203%208%202-4h3%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* Comments: a speech bubble. */
+.bc-comments {
+  --bc-bg: #ffe599;
+  --bc-img: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0d11%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%2012a8%208%200%200%201-11.6%207.1L4%2020l1.1-4.6A8%208%200%201%201%2021%2012z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* The swatch itself: the home page cards (`<i className="bc-icon bc-<icon>">`) and sidebar links with a `bc-<icon>`
+ * class. */
+.bc-icon,
+.menu__list-item[class*='bc-'] > .menu__link::before {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0.08rem 0.55rem 0 0;
+  border-radius: 5px;
+  background: var(--bc-img) center / 74% no-repeat, var(--bc-bg);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+.bc-grid .bc-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 0 0.2rem;
+  border-radius: 7px;
+}
+
+/* Search results (src/theme/SearchResult): the tool group's chip, tinted with its icon's colour (`.bc-<icon>` sets
+ * --bc-bg), as the Altium 365 API reference tints its bounded-context chips. */
+.badge--context {
+  border-color: color-mix(in srgb, var(--bc-bg) 75%, transparent);
+  background: color-mix(in srgb, var(--bc-bg) 32%, transparent);
+  color: var(--ifm-font-color-base);
+}
