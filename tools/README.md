@@ -23,7 +23,8 @@ labelled `needs-human` and asks the maintainers to review. Its pull request show
 run for a pull request the workflow's own token opens, and it ends without running. The sync ran the same checks itself,
 and a person's push to the branch starts them for real. A run skips the agents when the open pull request already has
 the new snapshot. A run that finds production matching the branch again closes an open bot pull request, or comments on
-it once if a person has committed to it.
+it once if a person has committed to it. Closing a sync pull request without merging declines its snapshot: later runs
+skip the agents until production changes again.
 
 It needs:
 

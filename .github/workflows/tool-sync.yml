@@ -109,12 +109,16 @@ jobs:
           open=$(gh pr list --head "$BRANCH" --state open --json number --jq length)
           echo "open=$open" >> "$GITHUB_OUTPUT"
           ours=true
+          mkdir -p ../.tool-sync
+          # The snapshot on a PR head, by branch or commit, to compare with production's.
+          same_snapshot() {
+            gh api "repos/$GITHUB_REPOSITORY/contents/tools/snapshot.json?ref=$1" -H "Accept: application/vnd.github.raw" > ../.tool-sync/pr-snapshot.json 2>/dev/null &&
+              cmp -s ../.tool-sync/pr-snapshot.json ../tools/snapshot.json
+          }
           if [ "$open" != "0" ]; then
-            mkdir -p ../.tool-sync
-            gh api "repos/$GITHUB_REPOSITORY/contents/tools/snapshot.json?ref=$BRANCH" -H "Accept: application/vnd.github.raw" > ../.tool-sync/open-snapshot.json
             # The API gives bot commits no author login, so tell them apart by the commit email.
             others=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_REF_NAME...$BRANCH" --jq '[.commits[] | select(.commit.author.email != "41898283+github-actions[bot]@users.noreply.github.com")] | length')
-            if cmp -s ../.tool-sync/open-snapshot.json ../tools/snapshot.json; then
+            if same_snapshot "$BRANCH"; then
               note="The open PR from $BRANCH already has this snapshot; nothing run."
               ours=false
             elif [ "$others" != "0" ]; then
@@ -125,10 +129,16 @@ jobs:
                 gh pr comment "$BRANCH" --body "$note"
               fi
             fi
-            if [ "$ours" = "false" ]; then
-              echo "$note"
-              echo "$note" >> "$GITHUB_STEP_SUMMARY"
+          else
+            # Closing a sync PR without merging declines its snapshot, until production changes again.
+            declined=$(gh pr list --head "$BRANCH" --base "$GITHUB_REF_NAME" --state closed --json headRefOid,mergedAt --jq 'map(select(.mergedAt == null)) | .[0].headRefOid // ""')
+            if [ -n "$declined" ] && same_snapshot "$declined"; then
+              note="A PR with this snapshot was closed without merging, so the change is declined; nothing run."
+              ours=false
             fi
+          fi
+          if [ "$ours" = "false" ]; then
+            echo "$note" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
           echo "ours=$ours" >> "$GITHUB_OUTPUT"
 
