@@ -48,11 +48,12 @@ jobs:
       - run: npm ci
 
       - name: Warn before the refresh token expires
-        if: vars.A365_REFRESH_TOKEN_EXPIRES != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          EXPIRES: ${{ vars.A365_REFRESH_TOKEN_EXPIRES }}
+          EXPIRES: ${{ secrets.A365_REFRESH_TOKEN_EXPIRES }}
         run: |
+          # A secret cannot gate a step's if:, so an unset one ends the step here.
+          [ -n "$EXPIRES" ] || exit 0
           if ! expires=$(date -d "$EXPIRES" +%s 2>/dev/null); then
             echo "::warning::A365_REFRESH_TOKEN_EXPIRES is not a date: $EXPIRES"
             exit 0
@@ -60,7 +61,7 @@ jobs:
           days=$(( (expires - $(date -d "$(date +%F)" +%s)) / 86400 ))
           title="Tool sync: the A365 refresh token expires on $EXPIRES"
           if [ "$days" -le 30 ] && [ -z "$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[].number')" ]; then
-            gh issue create --title "$title" --body "Create a new refresh token in the workspace's Admin > Developer page, then update the A365_REFRESH_TOKEN secret and the A365_REFRESH_TOKEN_EXPIRES variable. After the expiry, the tool sync workflow cannot read production's tools."
+            gh issue create --title "$title" --body "Create a new refresh token in the workspace's Admin > Developer page, then update the A365_REFRESH_TOKEN and A365_REFRESH_TOKEN_EXPIRES secrets. After the expiry, the tool sync workflow cannot read production's tools."
           fi
 
       - name: Snapshot production's tools

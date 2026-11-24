@@ -9,8 +9,8 @@ disagree.
   **Admin → Developer** page.
 - **What it cannot see:** that token is bound to one workspace, so the list leaves out tools served only on global
   connections. Documented tools the list cannot see are listed, each with its reason, in `not-in-snapshot.json`, so the
-  check exempts them. The `workspace_url` argument is dropped from every schema, because production lists it for this
-  credential on some responses and not others.
+  check exempts them. The `workspace_url` argument is dropped from every schema. Production offers it only to an
+  unscoped token on `mcp.altium.com`, yet some responses to this workspace-scoped token have included it.
 
 ## The tool sync workflow
 
@@ -24,9 +24,9 @@ push to the branch starts them for real. A run skips the agents when the open pu
 
 It needs:
 
-- **Secrets:** `ANTHROPIC_API_KEY`, and the three `A365_*` values above.
-- **Variable:** `A365_REFRESH_TOKEN_EXPIRES`, the refresh token's expiry as `YYYY-MM-DD`. From 30 days before, a run
-  opens an issue to replace the token, unless one is already open.
+- **Secrets:** `ANTHROPIC_API_KEY`, the three `A365_*` values above, and `A365_REFRESH_TOKEN_EXPIRES`, the refresh
+  token's expiry as `YYYY-MM-DD`. From 30 days before it, a run opens an issue to replace the token, unless one is
+  already open.
 - **Repository setting:** Actions, General, "Allow GitHub Actions to create and approve pull requests".
 
 For a dry run without the API, set `CLAUDE_BIN` to a stand-in for `claude`, then run

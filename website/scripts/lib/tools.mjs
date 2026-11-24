@@ -13,7 +13,7 @@ export const SNAPSHOT = join(REPO_ROOT, 'tools/snapshot.json');
 export const NOT_IN_SNAPSHOT = join(REPO_ROOT, 'tools/not-in-snapshot.json');
 
 // Arguments every schema carries that say nothing about one tool: the server's own bookkeeping, and the workspace URL,
-// which production lists for this credential on some responses and not others (tools/README.md).
+// offered only to unscoped tokens yet sometimes sent to the workspace-scoped snapshot token (tools/README.md).
 const PLUMBING_ARGS = new Set(['conversation_id', 'workspace_url']);
 const TOOL_FIELDS = ['name', 'title', 'description', 'inputSchema', 'annotations', '_meta'];
 

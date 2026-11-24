@@ -26,8 +26,8 @@ to make is in that diff. Otherwise you are working by hand, and the change is wh
     documented ahead of their release. Leave their rows alone. When one appears in the snapshot, remove its entry
     and document it from the snapshot like any other tool. In the sync workflow, never add an entry; by hand, add
     one with a `reason` when you document a tool the snapshot cannot see.
-  - The snapshot leaves out the `workspace_url` argument, which production lists on some responses and not others.
-    Its absence is not a change; keep the pages' mentions of it.
+  - The snapshot leaves out the `workspace_url` argument, which only unscoped tokens are offered. Its absence is not a
+    change; keep the pages' mentions of it.
 
 ## What you may change
 
