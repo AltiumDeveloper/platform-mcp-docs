@@ -3,6 +3,11 @@
 What changed in the Altium 365 MCP Server, newest first. Altium updates the server for you, so there is nothing to
 install; the [Tool reference](./tools/index.md) always describes the current release.
 
+## 2026-11-24
+
+- **Added** `a365_collaboration_comment_update` to [Collaboration](./tools/collaboration.md): edits existing comments, replacing their text in full.
+- **Changed** `a365_design_project_list`: returns 50 projects per page by default, up from 25.
+
 ## First release
 
 The server at `https://mcp.altium.com`, with sign-in through your Altium account and these tools:
